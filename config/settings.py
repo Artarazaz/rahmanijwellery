@@ -17,16 +17,45 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _env_text(name, default=""):
+    """Read an environment value while treating empty dashboard fields as unset."""
+    value = os.getenv(name)
+    return value.strip() if value and value.strip() else default
+
+
+def _env_int(name, default, minimum=None):
+    """Parse deployment integers without letting an empty value break startup."""
+    raw_value = os.getenv(name)
+    try:
+        value = int(raw_value.strip()) if raw_value and raw_value.strip() else int(default)
+    except (TypeError, ValueError):
+        value = int(default)
+    return max(minimum, value) if minimum is not None else value
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-427=s70n(+i%#=9*5#)1)t8q0%xhv7z+ob&myvylo7+xiu+1&9'
+SECRET_KEY = _env_text(
+    "SECRET_KEY",
+    'rahmani-local-fallback-key-change-this-in-vercel-7f3e9d1c5a8b4e2f6d0c9b7a1e5f3d8',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_text("DEBUG", "False" if _env_text("VERCEL") else "True").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()]
+_allowed_hosts = _env_text("ALLOWED_HOSTS", "127.0.0.1,localhost,.vercel.app").split(",")
+for _deployment_host_var in ("VERCEL_URL", "VERCEL_BRANCH_URL", "VERCEL_PROJECT_PRODUCTION_URL"):
+    _deployment_host = _env_text(_deployment_host_var)
+    if _deployment_host:
+        _allowed_hosts.append(_deployment_host)
+ALLOWED_HOSTS = list(dict.fromkeys(host.strip() for host in _allowed_hosts if host.strip()))
 
 
 # Application definition
@@ -118,34 +147,39 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Market provider configuration. Keep credentials in the environment, never in frontend code.
-MARKET_PROVIDER = os.getenv("MARKET_PROVIDER", "tgju_scrape").lower()
-MARKET_PROVIDER_URL = os.getenv("MARKET_PROVIDER_URL", "")
-MARKET_PROVIDER_TOKEN = os.getenv("MARKET_PROVIDER_TOKEN", "")
-MARKET_PROVIDER_ITEMS = os.getenv("MARKET_PROVIDER_ITEMS", "usd,eur,geram18,geram24,silver_999")
-MARKET_PROVIDER_UNIT = os.getenv("MARKET_PROVIDER_UNIT", "rial").lower()
-MARKET_DISPLAY_UNIT = os.getenv("MARKET_DISPLAY_UNIT", "toman").lower()
-MARKET_PRICE_CACHE_SECONDS = int(os.getenv("MARKET_PRICE_CACHE_SECONDS") or "10")
-MARKET_PROVIDER_TIMEOUT_SECONDS = int(os.getenv("MARKET_PROVIDER_TIMEOUT_SECONDS", "8"))
-MARKET_UPDATE_INTERVAL_SECONDS = int(os.getenv("MARKET_UPDATE_INTERVAL_SECONDS", "10"))
-MARKET_SNAPSHOT_STALE_AFTER_SECONDS = int(os.getenv("MARKET_SNAPSHOT_STALE_AFTER_SECONDS", "30"))
-TGJU_SCRAPE_URL = os.getenv("TGJU_SCRAPE_URL", "https://www.tgju.org/home")
-TGJU_SCRAPE_GOLD_URL = os.getenv("TGJU_SCRAPE_GOLD_URL", "https://www.tgju.org/gold-chart")
-TGJU_PROFILE_BASE_URL = os.getenv("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")
-TGJU_PROFILE_URL = os.getenv("TGJU_PROFILE_URL", "https://www.tgju.org/profile/geram18")
-TGJU_MARKET_LIST_API_URL = os.getenv(
+MARKET_PROVIDER = _env_text("MARKET_PROVIDER", "tgju_scrape").lower()
+MARKET_PROVIDER_URL = _env_text("MARKET_PROVIDER_URL")
+MARKET_PROVIDER_TOKEN = _env_text("MARKET_PROVIDER_TOKEN")
+MARKET_PROVIDER_ITEMS = _env_text("MARKET_PROVIDER_ITEMS", "usd,eur,geram18,geram24,silver_999")
+MARKET_PROVIDER_UNIT = _env_text("MARKET_PROVIDER_UNIT", "rial").lower()
+MARKET_DISPLAY_UNIT = _env_text("MARKET_DISPLAY_UNIT", "toman").lower()
+MARKET_PRICE_CACHE_SECONDS = _env_int("MARKET_PRICE_CACHE_SECONDS", 10, minimum=0)
+MARKET_PROVIDER_TIMEOUT_SECONDS = _env_int("MARKET_PROVIDER_TIMEOUT_SECONDS", 8, minimum=1)
+MARKET_UPDATE_INTERVAL_SECONDS = _env_int("MARKET_UPDATE_INTERVAL_SECONDS", 10, minimum=1)
+MARKET_SNAPSHOT_STALE_AFTER_SECONDS = _env_int(
+    "MARKET_SNAPSHOT_STALE_AFTER_SECONDS",
+    10 if _env_text("VERCEL") else 30,
+    minimum=1,
+)
+TGJU_SCRAPE_URL = _env_text("TGJU_SCRAPE_URL", "https://www.tgju.org/home")
+TGJU_SCRAPE_GOLD_URL = _env_text("TGJU_SCRAPE_GOLD_URL", "https://www.tgju.org/gold-chart")
+TGJU_PROFILE_BASE_URL = _env_text("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")
+TGJU_PROFILE_URL = _env_text("TGJU_PROFILE_URL", "https://www.tgju.org/profile/geram18")
+TGJU_MARKET_LIST_API_URL = _env_text(
     "TGJU_MARKET_LIST_API_URL",
     "https://api.tgju.org/v1/market/list-data",
 )
-TGJU_GOLD_CATEGORY_ID = os.getenv("TGJU_GOLD_CATEGORY_ID", "91818")
-TGJU_CURRENCY_CATEGORY_ID = os.getenv("TGJU_CURRENCY_CATEGORY_ID", "28070")
-TGJU_HISTORY_API_URL = os.getenv(
+TGJU_GOLD_CATEGORY_ID = _env_text("TGJU_GOLD_CATEGORY_ID", "91818")
+TGJU_CURRENCY_CATEGORY_ID = _env_text("TGJU_CURRENCY_CATEGORY_ID", "28070")
+TGJU_HISTORY_API_URL = _env_text(
     "TGJU_HISTORY_API_URL",
     "https://api.tgju.org/v1/market/indicator/summary-table-data/geram18",
 )
-TGJU_HISTORY_PAGE_LENGTH = int(os.getenv("TGJU_HISTORY_PAGE_LENGTH", "5000"))
+TGJU_HISTORY_PAGE_LENGTH = _env_int("TGJU_HISTORY_PAGE_LENGTH", 5000, minimum=7)
 
 
 # Email
@@ -153,6 +187,17 @@ TGJU_HISTORY_PAGE_LENGTH = int(os.getenv("TGJU_HISTORY_PAGE_LENGTH", "5000"))
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': _env_text(
+            "EMAIL_BACKEND",
+            "django.core.mail.backends.smtp.EmailBackend"
+            if not DEBUG
+            else "django.core.mail.backends.console.EmailBackend",
+        ),
     },
 }
+
+if not DEBUG:
+    # Vercel terminates HTTPS before the Django function; do not redirect again.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

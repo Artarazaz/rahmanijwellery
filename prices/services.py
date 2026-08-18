@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -17,7 +18,7 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import transaction
+from django.db import DatabaseError, transaction
 from django.utils import timezone
 
 from .models import MarketSnapshot
@@ -562,13 +563,86 @@ def refresh_market_snapshot():
         return snapshot
 
 
+def _is_vercel_runtime():
+    return str(os.getenv("VERCEL", "")).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _append_live_chart_point(chart, captured_at, gold18):
+    """Add a non-persisted Vercel reading to the chart response."""
+    for period in ("hourly", "daily", "monthly"):
+        source = chart[period]
+        bucket = _local_bucket(captured_at, period)
+        label = _chart_label(bucket, period)
+        value = _number(gold18)
+        if source["labels"] and source["labels"][-1] == label:
+            source["values"][-1] = value
+            source["data"][-1] = value
+        else:
+            source["labels"].append(label)
+            source["values"].append(value)
+            source["data"].append(value)
+            source["labels"] = source["labels"][-7:]
+            source["values"] = source["values"][-7:]
+            source["data"] = source["data"][-7:]
+
+
+def _live_chart_without_database(captured_at, gold18):
+    """Return a usable first chart point when Vercel has no SQLite file."""
+    value = _number(gold18)
+    chart = {}
+    for period in ("hourly", "daily", "monthly"):
+        bucket = _local_bucket(captured_at, period)
+        chart[period] = {
+            "labels": [_chart_label(bucket, period)],
+            "values": [value],
+            "data": [value],
+        }
+    return chart
+
+
+def _get_vercel_live_market_data(previous):
+    """Fetch a transient live payload when Vercel has no long-running worker."""
+    provider_payload = _fetch_provider_payload()
+    prices = _convert_to_display_unit(_extract_prices(provider_payload))
+    previous_prices = previous.prices if previous else {}
+    changes = {symbol: _change(prices[symbol], previous_prices.get(symbol)) for symbol in SYMBOLS}
+    captured_at = timezone.now()
+    snapshot = MarketSnapshot(
+        provider=str(_setting("MARKET_PROVIDER", "tgju_scrape")),
+        unit=str(_setting("MARKET_DISPLAY_UNIT", "toman")),
+        prices={symbol: str(prices[symbol]) for symbol in SYMBOLS},
+        changes={symbol: str(changes[symbol]) if changes[symbol] is not None else None for symbol in SYMBOLS},
+        provider_timestamp=_provider_timestamp(provider_payload),
+        captured_at=captured_at,
+    )
+    try:
+        chart = build_chart_data()
+    except DatabaseError:
+        chart = _live_chart_without_database(captured_at, prices["gold18"])
+    _append_live_chart_point(chart, captured_at, prices["gold18"])
+    return _snapshot_payload(snapshot, stale=False, chart=chart)
+
+
 def get_market_data(force=False):
-    """Read the latest persisted snapshot; network fetching belongs to the worker."""
-    snapshot = MarketSnapshot.objects.first()
+    """Read persisted data, with a serverless fallback for Vercel deployments."""
+    try:
+        snapshot = MarketSnapshot.objects.first()
+    except DatabaseError:
+        if _is_vercel_runtime():
+            return _get_vercel_live_market_data(None)
+        raise
     if snapshot is None:
+        if _is_vercel_runtime():
+            return _get_vercel_live_market_data(None)
         raise ProviderError("No market snapshot has been collected yet")
-    stale_after = int(_setting("MARKET_SNAPSHOT_STALE_AFTER_SECONDS", 30))
+    stale_default = 10 if _is_vercel_runtime() else 30
+    stale_after = int(_setting("MARKET_SNAPSHOT_STALE_AFTER_SECONDS", stale_default))
     stale = timezone.now() - snapshot.captured_at > timedelta(seconds=stale_after)
+    if _is_vercel_runtime() and stale:
+        try:
+            return _get_vercel_live_market_data(snapshot)
+        except ProviderError as error:
+            return _snapshot_payload(snapshot, stale=True, error=str(error))
     return _snapshot_payload(snapshot, stale=stale)
 
 

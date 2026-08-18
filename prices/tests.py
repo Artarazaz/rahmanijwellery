@@ -1,7 +1,9 @@
-from unittest.mock import patch
+import os
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
+from django.db import OperationalError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -12,6 +14,7 @@ from .services import (
     _change,
     _extract_tgju_market_list,
     clear_market_cache,
+    get_market_data,
     refresh_market_snapshot,
 )
 
@@ -104,3 +107,34 @@ class MarketApiTests(TestCase):
 
     def test_change_does_not_return_negative_zero(self):
         self.assertEqual(_change(Decimal("100000"), Decimal("100001")), Decimal("0.00"))
+
+    @patch.dict(os.environ, {"VERCEL": "1"})
+    @patch("prices.services._fetch_provider_payload")
+    def test_vercel_reads_live_data_when_saved_snapshot_is_stale(self, fetch):
+        fetch.return_value = self.provider_payload("10500000")
+        MarketSnapshot.objects.create(
+            provider="tgju_scrape",
+            unit="toman",
+            prices={
+                "gold18": "10000000",
+                "gold24": "13333333",
+                "usd": "59200",
+                "eur": "64500",
+                "silver": "58000",
+            },
+            changes={symbol: None for symbol in ("gold18", "gold24", "usd", "eur", "silver")},
+            captured_at=timezone.now() - timedelta(seconds=60),
+        )
+        payload = get_market_data()
+        self.assertFalse(payload["stale"])
+        self.assertEqual(payload["prices"]["gold18"]["value"], 10500000)
+
+    @patch.dict(os.environ, {"VERCEL": "1"})
+    @patch("prices.services.MarketSnapshot.objects.first", side_effect=OperationalError("no such table"))
+    @patch("prices.services._fetch_provider_payload")
+    def test_vercel_reads_live_data_without_a_database_table(self, fetch, _first):
+        fetch.return_value = self.provider_payload("10500000")
+        payload = get_market_data()
+        self.assertFalse(payload["stale"])
+        self.assertEqual(payload["prices"]["gold18"]["value"], 10500000)
+        self.assertEqual(len(payload["chart"]["hourly"]["data"]), 1)
