@@ -206,6 +206,11 @@ TGJU_SCRAPE_URL = _env_text("TGJU_SCRAPE_URL", "https://www.tgju.org/home")
 TGJU_SCRAPE_GOLD_URL = _env_text("TGJU_SCRAPE_GOLD_URL", "https://www.tgju.org/gold-chart")
 TGJU_PROFILE_BASE_URL = _env_text("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")
 TGJU_PROFILE_URL = _env_text("TGJU_PROFILE_URL", "https://www.tgju.org/profile/geram18")
+TGJU_LOCAL_MARKETS_URL = _env_text("TGJU_LOCAL_MARKETS_URL", "https://www.tgju.org/local-markets")
+TGJU_GLOBAL_MARKETS_URL = _env_text(
+    "TGJU_GLOBAL_MARKETS_URL",
+    "https://www.tgju.org/profile/crypto-page/markets-global",
+)
 TGJU_MARKET_LIST_API_URL = _env_text(
     "TGJU_MARKET_LIST_API_URL",
     "https://api.tgju.org/v1/market/list-data",

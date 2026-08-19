@@ -12,7 +12,10 @@ from .services import (
     ProviderError,
     _TGJUPriceTableParser,
     _change,
+    _extract_tgju_global_market_rows,
+    _extract_tgju_market_rows,
     _extract_tgju_market_list,
+    _fetch_tgju_local_tether_current,
     clear_market_cache,
     get_market_data,
     refresh_market_snapshot,
@@ -38,12 +41,25 @@ class MarketApiTests(TestCase):
                 {"symbol": "usd", "price": "59200"},
                 {"symbol": "eur", "price": "64500"},
                 {"symbol": "silver_999", "price": "58000"},
+                {"symbol": "tether", "price": "60000"},
+                {"symbol": "coin_full", "price": "170000000"},
+                {"symbol": "coin_half", "price": "90000000"},
+                {"symbol": "coin_quarter", "price": "50000000"},
+                {"symbol": "ounce", "price": "2500.25"},
+                {"symbol": "oil", "price": "75.50"},
             ]
         }
 
     @patch("prices.services._fetch_provider_payload")
-    def test_market_endpoint_calculates_change_from_previous_snapshot(self, fetch):
+    def test_market_endpoint_calculates_change_from_first_complete_snapshot_of_day(self, fetch):
         fetch.return_value = self.provider_payload()
+        MarketSnapshot.objects.create(
+            provider="tgju_scrape",
+            unit="toman",
+            prices={"gold18": "9900000", "gold24": "13200000", "usd": "59000", "eur": "64000", "silver": "57000"},
+            changes={},
+            captured_at=timezone.now() - timedelta(minutes=5),
+        )
         refresh_market_snapshot()
         first = self.client.get("/api/market/")
         self.assertEqual(first.status_code, 200)
@@ -55,6 +71,12 @@ class MarketApiTests(TestCase):
         self.assertEqual(second.status_code, 200)
         self.assertEqual(second.json()["prices"]["gold18"]["value"], 10500000)
         self.assertEqual(second.json()["prices"]["gold18"]["change_percent"], 5.0)
+
+        fetch.return_value = self.provider_payload("11000000")
+        refresh_market_snapshot()
+        third = self.client.get("/api/market/")
+        self.assertEqual(third.json()["prices"]["gold18"]["change_percent"], 10.0)
+        self.assertEqual(third.json()["prices"]["ounce"]["unit"], "usd")
 
     @patch("prices.services._fetch_provider_payload")
     def test_provider_failure_returns_last_snapshot_as_stale(self, fetch):
@@ -105,6 +127,30 @@ class MarketApiTests(TestCase):
             {"geram18": Decimal("193500000"), "price_eur": Decimal("2169000")},
         )
 
+    def test_tgju_html_market_row_parser_reads_current_values(self):
+        html = (
+            '<tr data-market-row="sekeb" data-title="<div>1</div>" data-price="1,909,300,000"><td>سکه</td></tr>'
+            '<tr data-market-row="nim" data-price="980,000,000"><td>نیم</td></tr>'
+        )
+        self.assertEqual(
+            _extract_tgju_market_rows(html, {"sekeb", "nim"}),
+            {"sekeb": Decimal("1909300000"), "nim": Decimal("980000000")},
+        )
+
+    def test_tgju_global_market_parser_reads_ticker_values(self):
+        html = '<li id="l-oil_brent"><span class="info-price">91.932</span></li>'
+        self.assertEqual(
+            _extract_tgju_global_market_rows(html, {"oil_brent"}),
+            {"oil_brent": Decimal("91.932")},
+        )
+
+    @patch("prices.services._scrape_tgju_page")
+    def test_tgju_tether_parser_uses_local_usdt_quote(self, scrape):
+        scrape.return_value = [
+            {"cells": ["ارزاینجا", "USDT / IRR", "1,894,500", "1,894,500"]},
+        ]
+        self.assertEqual(_fetch_tgju_local_tether_current(), Decimal("1894500"))
+
     def test_change_does_not_return_negative_zero(self):
         self.assertEqual(_change(Decimal("100000"), Decimal("100001")), Decimal("0.00"))
 
@@ -122,7 +168,10 @@ class MarketApiTests(TestCase):
                 "eur": "64500",
                 "silver": "58000",
             },
-            changes={symbol: None for symbol in ("gold18", "gold24", "usd", "eur", "silver")},
+            changes={symbol: None for symbol in (
+                "gold18", "gold24", "usd", "eur", "silver", "tether",
+                "coin_full", "coin_half", "coin_quarter", "ounce", "oil",
+            )},
             captured_at=timezone.now() - timedelta(seconds=60),
         )
         payload = get_market_data()

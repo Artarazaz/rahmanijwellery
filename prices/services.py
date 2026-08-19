@@ -24,13 +24,33 @@ from django.utils import timezone
 from .models import MarketSnapshot
 
 
-SYMBOLS = ("gold18", "gold24", "usd", "eur", "silver")
+SYMBOLS = (
+    "gold18",
+    "gold24",
+    "usd",
+    "eur",
+    "silver",
+    "tether",
+    "coin_full",
+    "coin_half",
+    "coin_quarter",
+    "ounce",
+    "oil",
+)
+GLOBAL_SYMBOLS = {"ounce", "oil"}
+LOCAL_PRICE_SYMBOLS = set(SYMBOLS) - GLOBAL_SYMBOLS
 SYMBOL_ALIASES = {
     "gold18": ("gold18", "gold18k", "gold_18k", "geram18", "geram18k", "18k", "gold18karat"),
     "gold24": ("gold24", "gold24k", "gold_24k", "geram24", "geram24k", "24k", "gold24karat"),
     "usd": ("usd", "dollar", "dollaram", "us dollar", "us_dollar", "dollarusa"),
     "eur": ("eur", "euro", "euros"),
     "silver": ("silver", "silver999", "silver_999", "xag", "noghre", "geramnaghre"),
+    "tether": ("tether", "usdt", "cryptotether"),
+    "coin_full": ("coinfull", "sekeb", "baharazadi", "fullcoin"),
+    "coin_half": ("coinhalf", "nim", "halfcoin"),
+    "coin_quarter": ("coinquarter", "rob", "quartercoin"),
+    "ounce": ("ounce", "ons", "goldounce"),
+    "oil": ("oil", "brentoil", "energybrentoil"),
 }
 PERSIAN_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 PERSIAN_WEEKDAYS = ("دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه", "شنبه", "یکشنبه")
@@ -227,7 +247,13 @@ class _TGJUPriceTableParser(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if tag == "tr":
-            self.row = {"cells": [], "href": None}
+            attrs_map = dict(attrs)
+            self.row = {
+                "cells": [],
+                "href": None,
+                "market_row": attrs_map.get("data-market-row"),
+                "data_price": attrs_map.get("data-price"),
+            }
         elif self.row is not None and tag in {"td", "th"}:
             self.cell = []
         elif self.row is not None and tag == "a":
@@ -285,6 +311,20 @@ def _fetch_tgju_profile_current(slug):
     raise ProviderError(f"TGJU profile {slug} is missing its current rate")
 
 
+def _fetch_tgju_local_tether_current():
+    """Read the first active USDT/IRR sell quote from TGJU's local market table."""
+    profile_base_url = str(_setting("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")).rstrip("/")
+    rows = _scrape_tgju_page(f"{profile_base_url}/crypto-tether/markets-local")
+    for row in rows:
+        cells = row.get("cells", [])
+        if len(cells) < 3 or "USDT / IRR" not in cells[1].upper():
+            continue
+        value = _as_decimal(cells[2])
+        if value is not None:
+            return value
+    raise ProviderError("TGJU local tether market has no active USDT/IRR quote")
+
+
 def _extract_tgju_market_list(payload, slugs):
     prices = {}
     for row in payload.get("data", []):
@@ -300,16 +340,51 @@ def _extract_tgju_market_list(payload, slugs):
     return prices
 
 
+def _extract_tgju_market_rows(html, slugs):
+    """Extract current values from TGJU's HTML market rows."""
+    parser = _TGJUPriceTableParser()
+    parser.feed(html)
+    prices = {}
+    for row in parser.rows:
+        slug = str(row.get("market_row") or "").strip()
+        if slug not in slugs:
+            continue
+        value = _as_decimal(row.get("data_price"))
+        if value is not None:
+            prices[slug] = value
+    return prices
+
+
+def _extract_tgju_global_market_rows(html, slugs):
+    """Extract current values from TGJU's global-market ticker rows."""
+    prices = {}
+    pattern = re.compile(
+        r'<li\b[^>]*id=["\']l-([^"\']+)["\'][^>]*>.*?'
+        r'<span\b[^>]*class=["\'][^"\']*info-price[^"\']*["\'][^>]*>(.*?)</span>',
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(html):
+        slug = match.group(1).strip()
+        if slug not in slugs:
+            continue
+        value = _as_decimal(re.sub(r"<[^>]+>", " ", match.group(2)))
+        if value is not None:
+            prices[slug] = value
+    return prices
+
+
 def _fetch_tgju_scrape_payload():
-    profile_symbols = {
-        "geram18": "gold18",
-        "geram24": "gold24",
-        "price_dollar_rl": "usd",
-        "price_eur": "eur",
-        "silver_999": "silver",
-    }
     market_list_url = str(
         _setting("TGJU_MARKET_LIST_API_URL", "https://api.tgju.org/v1/market/list-data")
+    )
+    local_markets_url = str(
+        _setting("TGJU_LOCAL_MARKETS_URL", "https://www.tgju.org/local-markets")
+    )
+    global_markets_url = str(
+        _setting(
+            "TGJU_GLOBAL_MARKETS_URL",
+            "https://www.tgju.org/profile/crypto-page/markets-global",
+        )
     )
 
     def fetch_market_list(category_id):
@@ -318,11 +393,25 @@ def _fetch_tgju_scrape_payload():
             {"category_ids": category_id, "extra_data": "1", "lang": "fa"},
         )
 
+    def fetch_local_markets():
+        return _extract_tgju_market_rows(
+            _fetch_tgju_html(local_markets_url),
+            {"sekeb", "nim", "rob", "ons"},
+        )
+
+    def fetch_global_markets():
+        return _extract_tgju_global_market_rows(_fetch_tgju_html(global_markets_url), {"oil_brent"})
+
     extracted = {}
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    with ThreadPoolExecutor(max_workers=6) as executor:
         gold_future = executor.submit(fetch_market_list, _setting("TGJU_GOLD_CATEGORY_ID", "91818"))
         currency_future = executor.submit(fetch_market_list, _setting("TGJU_CURRENCY_CATEGORY_ID", "28070"))
-        silver_future = executor.submit(_fetch_tgju_profile_current, "silver_999")
+        local_future = executor.submit(fetch_local_markets)
+        global_future = executor.submit(fetch_global_markets)
+        profile_futures = {
+            "silver": executor.submit(_fetch_tgju_profile_current, "silver_999"),
+            "tether": executor.submit(_fetch_tgju_local_tether_current),
+        }
         gold_prices = _extract_tgju_market_list(gold_future.result(), {"geram18", "geram24"})
         extracted.update(
             {
@@ -336,7 +425,18 @@ def _fetch_tgju_scrape_payload():
         extracted.update(
             {"usd": currency_prices.get("price_dollar_rl"), "eur": currency_prices.get("price_eur")}
         )
-        extracted["silver"] = silver_future.result()
+        local_prices = local_future.result()
+        extracted.update(
+            {
+                "coin_full": local_prices.get("sekeb"),
+                "coin_half": local_prices.get("nim"),
+                "coin_quarter": local_prices.get("rob"),
+                "ounce": local_prices.get("ons"),
+            }
+        )
+        extracted["oil"] = global_future.result().get("oil_brent")
+        for symbol, future in profile_futures.items():
+            extracted[symbol] = future.result()
 
     missing = [symbol for symbol in SYMBOLS if extracted.get(symbol) is None]
     if missing:
@@ -443,13 +543,24 @@ def _fetch_tgju_intraday_history():
 def _convert_to_display_unit(prices: dict[str, Decimal]) -> dict[str, Decimal]:
     provider_unit = str(_setting("MARKET_PROVIDER_UNIT", "rial")).lower()
     display_unit = str(_setting("MARKET_DISPLAY_UNIT", "toman")).lower()
+    converted = dict(prices)
     if provider_unit == display_unit:
-        return prices
+        return converted
     if provider_unit == "rial" and display_unit == "toman":
-        return {symbol: value / Decimal("10") for symbol, value in prices.items()}
+        return {
+            symbol: value / Decimal("10") if symbol in LOCAL_PRICE_SYMBOLS else value
+            for symbol, value in converted.items()
+        }
     if provider_unit == "toman" and display_unit == "rial":
-        return {symbol: value * Decimal("10") for symbol, value in prices.items()}
+        return {
+            symbol: value * Decimal("10") if symbol in LOCAL_PRICE_SYMBOLS else value
+            for symbol, value in converted.items()
+        }
     raise ProviderError(f"Unsupported unit conversion: {provider_unit} -> {display_unit}")
+
+
+def _display_unit_for_symbol(symbol):
+    return "usd" if symbol in GLOBAL_SYMBOLS else str(_setting("MARKET_DISPLAY_UNIT", "toman"))
 
 
 def _change(current: Decimal, previous) -> Decimal | None:
@@ -462,6 +573,19 @@ def _change(current: Decimal, previous) -> Decimal | None:
     # Avoid serializing Decimal("-0.00"), which is mathematically zero but
     # can be rendered as a misleading downward movement in the UI.
     return Decimal("0.00") if change == Decimal("0") else change
+
+
+def _first_snapshot_of_day(provider, captured_at):
+    """Return the first complete snapshot today for daily percentage baselines."""
+    day_start = _local_bucket(captured_at, "daily")
+    snapshots = MarketSnapshot.objects.filter(
+        provider=provider,
+        captured_at__gte=day_start,
+    ).order_by("captured_at")
+    for snapshot in snapshots.iterator():
+        if all(_as_decimal(snapshot.prices.get(symbol)) is not None for symbol in SYMBOLS):
+            return snapshot
+    return None
 
 
 def seed_market_history():
@@ -529,6 +653,7 @@ def _snapshot_payload(snapshot: MarketSnapshot, stale=False, error=None, chart=N
             "value": _number(value),
             "formatted": _padded_number(value),
             "change_percent": _number(change),
+            "unit": _display_unit_for_symbol(symbol),
         }
     payload = {
         "timestamp": snapshot.captured_at.isoformat(),
@@ -549,15 +674,18 @@ def refresh_market_snapshot():
     with _FETCH_LOCK:
         provider_payload = _fetch_provider_payload()
         prices = _convert_to_display_unit(_extract_prices(provider_payload))
-        previous = MarketSnapshot.objects.first()
-        previous_prices = previous.prices if previous else {}
-        changes = {symbol: _change(prices[symbol], previous_prices.get(symbol)) for symbol in SYMBOLS}
+        provider = str(_setting("MARKET_PROVIDER", "tgju_scrape"))
+        captured_at = timezone.now()
+        first_today = _first_snapshot_of_day(provider, captured_at)
+        baseline_prices = first_today.prices if first_today else {}
+        changes = {symbol: _change(prices[symbol], baseline_prices.get(symbol)) for symbol in SYMBOLS}
         snapshot = MarketSnapshot.objects.create(
-            provider=str(_setting("MARKET_PROVIDER", "tgju_scrape")),
+            provider=provider,
             unit=str(_setting("MARKET_DISPLAY_UNIT", "toman")),
             prices={symbol: str(prices[symbol]) for symbol in SYMBOLS},
             changes={symbol: str(changes[symbol]) if changes[symbol] is not None else None for symbol in SYMBOLS},
             provider_timestamp=_provider_timestamp(provider_payload),
+            captured_at=captured_at,
         )
         clear_market_cache()
         return snapshot
@@ -604,17 +732,33 @@ def _get_vercel_live_market_data(previous):
     """Fetch a transient live payload when Vercel has no long-running worker."""
     provider_payload = _fetch_provider_payload()
     prices = _convert_to_display_unit(_extract_prices(provider_payload))
-    previous_prices = previous.prices if previous else {}
-    changes = {symbol: _change(prices[symbol], previous_prices.get(symbol)) for symbol in SYMBOLS}
     captured_at = timezone.now()
+    provider = str(_setting("MARKET_PROVIDER", "tgju_scrape"))
+    try:
+        first_today = _first_snapshot_of_day(provider, captured_at)
+        baseline_prices = first_today.prices if first_today else {}
+    except DatabaseError:
+        baseline_prices = {}
+    changes = {symbol: _change(prices[symbol], baseline_prices.get(symbol)) for symbol in SYMBOLS}
     snapshot = MarketSnapshot(
-        provider=str(_setting("MARKET_PROVIDER", "tgju_scrape")),
+        provider=provider,
         unit=str(_setting("MARKET_DISPLAY_UNIT", "toman")),
         prices={symbol: str(prices[symbol]) for symbol in SYMBOLS},
         changes={symbol: str(changes[symbol]) if changes[symbol] is not None else None for symbol in SYMBOLS},
         provider_timestamp=_provider_timestamp(provider_payload),
         captured_at=captured_at,
     )
+    try:
+        snapshot = MarketSnapshot.objects.create(
+            provider=snapshot.provider,
+            unit=snapshot.unit,
+            prices=snapshot.prices,
+            changes=snapshot.changes,
+            provider_timestamp=snapshot.provider_timestamp,
+            captured_at=snapshot.captured_at,
+        )
+    except DatabaseError:
+        pass
     try:
         chart = build_chart_data()
     except DatabaseError:

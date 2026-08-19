@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiUrl = (path) => `${API_BASE_URL}${path}`;
     const formatMoney = (number) => new Intl.NumberFormat('fa-IR').format(number);
     const toPersianDigits = (value) => String(value).replace(/[0-9]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[digit]);
-    const unitLabels = { toman: 'تومان', rial: 'ریال' };
+    const unitLabels = { toman: 'تومان', rial: 'ریال', usd: 'دلار' };
 
     // Product prices are recalculated whenever the live 18K value changes.
     const calculateProductPrices = () => {
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const icon = numericChange > 0 ? 'ph-arrow-up-left' : numericChange < 0 ? 'ph-arrow-down-left' : 'ph-minus';
         const prefix = numericChange > 0 ? '+' : '';
         trend.className = `trend ${direction}`;
-        trend.innerHTML = `<i class="ph ${icon}"></i> ${prefix}${toPersianDigits(numericChange.toFixed(2))}٪ نسبت به قبل`;
+        trend.innerHTML = `<i class="ph ${icon}"></i> ${prefix}${toPersianDigits(numericChange.toFixed(2))}٪ نسبت به اولین قیمت امروز`;
     };
 
     const renderMarket = (payload) => {
@@ -145,14 +145,20 @@ document.addEventListener('DOMContentLoaded', () => {
             gold24: 'live-gold24-price',
             usd: 'live-dollar-price',
             eur: 'live-euro-price',
-            silver: 'live-silver-price'
+            silver: 'live-silver-price',
+            tether: 'live-tether-price',
+            coin_full: 'live-coin-full-price',
+            coin_half: 'live-coin-half-price',
+            coin_quarter: 'live-coin-quarter-price',
+            ounce: 'live-ounce-price',
+            oil: 'live-oil-price'
         };
-        const displayUnit = unitLabels[payload.unit] || payload.unit || 'تومان';
         Object.entries(marketMap).forEach(([symbol, id]) => {
             const element = document.getElementById(id);
             const card = element?.closest('.price-card');
             const price = payload.prices?.[symbol];
             if (!element || !price || !Number.isFinite(Number(price.value))) return;
+            const displayUnit = unitLabels[price.unit] || unitLabels[payload.unit] || price.unit || payload.unit || 'تومان';
             element.dataset.rawPrice = String(price.value);
             element.innerHTML = `${formatMoney(Number(price.value))} <small>${displayUnit}</small>`;
             renderTrend(card, price.change_percent);
@@ -164,18 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (status) {
             status.classList.toggle('is-stale', Boolean(payload.stale));
             status.classList.toggle('is-error', false);
-            const title = status.querySelector('strong');
-            const detail = status.querySelector('small');
-            if (payload.stale) {
-                title.textContent = 'آخرین قیمت معتبر';
-                detail.textContent = 'ارتباط با provider موقتاً قطع است';
-            } else {
-                title.textContent = 'به‌روزرسانی زنده';
-                const updatedAt = payload.timestamp ? new Date(payload.timestamp) : null;
-                detail.textContent = updatedAt && !Number.isNaN(updatedAt.getTime())
-                    ? `آخرین بررسی: ${updatedAt.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
-                    : 'آخرین بررسی: همین لحظه';
-            }
         }
     };
 
@@ -184,8 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!status) return;
         status.classList.remove('is-stale');
         status.classList.add('is-error');
-        status.querySelector('strong').textContent = 'داده در دسترس نیست';
-        status.querySelector('small').textContent = 'اتصال به API بازار برقرار نشد';
     };
 
     let marketRequestInFlight = false;
