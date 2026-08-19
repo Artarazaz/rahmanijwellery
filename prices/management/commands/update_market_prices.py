@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--interval",
             type=int,
-            default=int(getattr(settings, "MARKET_UPDATE_INTERVAL_SECONDS", 10)),
+            default=int(getattr(settings, "MARKET_UPDATE_INTERVAL_SECONDS", 5)),
             help="Seconds between refreshes when --watch is enabled.",
         )
 

@@ -261,5 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateChartGradient();
 
     loadMarketData();
-    window.setInterval(loadMarketData, 10000);
+    window.setInterval(loadMarketData, 5000);
 });

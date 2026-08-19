@@ -23,7 +23,7 @@ from .services import (
     MARKET_PROVIDER_URL="https://provider.test/market",
     MARKET_PROVIDER_UNIT="toman",
     MARKET_DISPLAY_UNIT="toman",
-    MARKET_PRICE_CACHE_SECONDS=10,
+    MARKET_PRICE_CACHE_SECONDS=5,
 )
 class MarketApiTests(TestCase):
     def setUp(self):
