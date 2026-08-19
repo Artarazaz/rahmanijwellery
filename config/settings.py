@@ -12,9 +12,18 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    from dotenv import load_dotenv
+except ImportError:  # The production build installs python-dotenv from requirements.txt.
+    load_dotenv = None
+
+if load_dotenv:
+    load_dotenv(BASE_DIR / ".env")
 
 
 def _env_text(name, default=""):
@@ -31,6 +40,30 @@ def _env_int(name, default, minimum=None):
     except (TypeError, ValueError):
         value = int(default)
     return max(minimum, value) if minimum is not None else value
+
+
+def _postgres_database(url):
+    """Convert a Neon PostgreSQL URL into Django's database configuration."""
+    parsed = urlparse(url)
+    if parsed.scheme not in {"postgres", "postgresql"} or not parsed.hostname:
+        raise ValueError("DATABASE_URL must be a valid PostgreSQL connection URL")
+
+    query = parse_qs(parsed.query)
+    options = {key: values[-1] for key, values in query.items() if values}
+    options.setdefault("sslmode", "require")
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": unquote(parsed.path.lstrip("/")),
+        "USER": unquote(parsed.username or ""),
+        "PASSWORD": unquote(parsed.password or ""),
+        "HOST": parsed.hostname,
+        "PORT": str(parsed.port or 5432),
+        "OPTIONS": options,
+        # A serverless function should release connections after each request;
+        # the local worker can reuse one briefly for better efficiency.
+        "CONN_MAX_AGE": 0 if _env_text("VERCEL") else 60,
+        "CONN_HEALTH_CHECKS": True,
+    }
 
 
 # Quick-start development settings - unsuitable for production
@@ -104,12 +137,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = _env_text("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {"default": _postgres_database(DATABASE_URL)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
 
 
 # Password validation
