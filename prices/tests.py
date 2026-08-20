@@ -1,7 +1,8 @@
+import json
 import os
 from datetime import timedelta
 from decimal import Decimal
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.db import OperationalError
 from django.test import TestCase, override_settings
@@ -13,8 +14,10 @@ from .services import (
     _TGJUPriceTableParser,
     _change,
     _extract_tgju_global_market_rows,
+    _extract_prices,
     _extract_tgju_market_rows,
     _extract_tgju_market_list,
+    _fetch_provider_payload,
     _fetch_tgju_local_tether_current,
     clear_market_cache,
     get_market_data,
@@ -63,6 +66,7 @@ class MarketApiTests(TestCase):
         refresh_market_snapshot()
         first = self.client.get("/api/market/")
         self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.headers["Cache-Control"], "no-store, max-age=0")
         self.assertIsNone(first.json()["prices"]["gold18"]["change_percent"])
 
         fetch.return_value = self.provider_payload("10500000")
@@ -144,12 +148,49 @@ class MarketApiTests(TestCase):
             {"oil_brent": Decimal("91.932")},
         )
 
+    @patch("prices.services._fetch_tgju_json")
+    def test_tgju_tether_parser_uses_json_api_first(self, fetch_json):
+        """Primary path: reads USDT/IRR from JSON summary API (works on Vercel)."""
+        fetch_json.return_value = {
+            "data": [["274,000", "270,000", "274,000", "273,000"]],
+            "recordsTotal": 45,
+        }
+        self.assertEqual(_fetch_tgju_local_tether_current(), Decimal("273000"))
+
     @patch("prices.services._scrape_tgju_page")
-    def test_tgju_tether_parser_uses_local_usdt_quote(self, scrape):
+    @patch("prices.services._fetch_tgju_json", side_effect=ProviderError("JSON API unavailable"))
+    def test_tgju_tether_parser_falls_back_to_local_usdt_quote(self, _fetch_json, scrape):
+        """Fallback path: reads USDT/IRR from HTML scraping (works on local server)."""
         scrape.return_value = [
             {"cells": ["ارزاینجا", "USDT / IRR", "1,894,500", "1,894,500"]},
         ]
         self.assertEqual(_fetch_tgju_local_tether_current(), Decimal("1894500"))
+
+    @override_settings(
+        MARKET_PROVIDER="tgju",
+        MARKET_PROVIDER_URL="https://provider.test/market",
+    )
+    @patch("prices.services._fetch_tgju_scrape_payload")
+    @patch("prices.services.urlopen")
+    def test_official_provider_response_is_enriched_with_new_symbols(self, urlopen, scrape):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = json.dumps({"data": [
+            {"symbol": "geram18", "price": "10000000"},
+            {"symbol": "geram24", "price": "13333333"},
+            {"symbol": "usd", "price": "59200"},
+            {"symbol": "eur", "price": "64500"},
+            {"symbol": "silver_999", "price": "58000"},
+        ]}).encode("utf-8")
+        urlopen.return_value = response
+        scrape.return_value = self.provider_payload()
+
+        payload = _fetch_provider_payload()
+
+        self.assertEqual(set(_extract_prices(payload)), {
+            "gold18", "gold24", "usd", "eur", "silver", "tether",
+            "coin_full", "coin_half", "coin_quarter", "ounce", "oil",
+        })
 
     def test_change_does_not_return_negative_zero(self):
         self.assertEqual(_change(Decimal("100000"), Decimal("100001")), Decimal("0.00"))

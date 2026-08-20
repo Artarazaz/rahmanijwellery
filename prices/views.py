@@ -14,8 +14,12 @@ def market_data(request):
     try:
         payload = get_market_data()
     except ProviderError as error:
-        return JsonResponse({"error": str(error), "code": "market_provider_unavailable"}, status=503)
-    return JsonResponse(payload)
+        response = JsonResponse({"error": str(error), "code": "market_provider_unavailable"}, status=503)
+        response["Cache-Control"] = "no-store, max-age=0"
+        return response
+    response = JsonResponse(payload)
+    response["Cache-Control"] = "no-store, max-age=0"
+    return response
 
 
 @require_GET

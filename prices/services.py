@@ -148,6 +148,14 @@ def _records(payload, key_hint=""):
 
 
 def _extract_prices(payload) -> dict[str, Decimal]:
+    prices = _extract_prices_partial(payload)
+    if set(prices) != set(SYMBOLS):
+        missing = ", ".join(symbol for symbol in SYMBOLS if symbol not in prices)
+        raise ProviderError(f"Provider response is missing: {missing}")
+    return prices
+
+
+def _extract_prices_partial(payload) -> dict[str, Decimal]:
     prices: dict[str, Decimal] = {}
     for hint, record in _records(payload):
         if not isinstance(record, dict):
@@ -164,10 +172,6 @@ def _extract_prices(payload) -> dict[str, Decimal]:
         value = _value_from_record(record)
         if symbol and value is not None and symbol not in prices:
             prices[symbol] = value
-
-    if set(prices) != set(SYMBOLS):
-        missing = ", ".join(symbol for symbol in SYMBOLS if symbol not in prices)
-        raise ProviderError(f"Provider response is missing: {missing}")
     return prices
 
 
@@ -219,6 +223,8 @@ def _fetch_provider_payload():
     provider = str(_setting("MARKET_PROVIDER", "tgju")).lower()
     if provider == "tgju_scrape":
         return _fetch_tgju_scrape_payload()
+    if provider == "tgju" and not str(_setting("MARKET_PROVIDER_URL", "")).strip():
+        return _fetch_tgju_scrape_payload()
     url = _provider_url()
     token = str(_setting("MARKET_PROVIDER_TOKEN", "")).strip()
     headers = {"Accept": "application/json", "User-Agent": "RahmaniMarket/1.0"}
@@ -231,9 +237,27 @@ def _fetch_provider_payload():
     except (HTTPError, URLError, TimeoutError, OSError) as error:
         raise ProviderError(f"Market provider request failed: {error}") from error
     try:
-        return json.loads(raw.decode("utf-8"))
+        payload = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ProviderError("Market provider returned invalid JSON") from error
+
+    if provider != "tgju":
+        return payload
+
+    # Older TGJU API configurations commonly return only the original five
+    # symbols. Enrich such a response so production does not silently keep
+    # serving a snapshot without the newly added dashboard cards.
+    provider_prices = _extract_prices_partial(payload)
+    missing = [symbol for symbol in SYMBOLS if symbol not in provider_prices]
+    if not missing:
+        return payload
+    scraped_payload = _fetch_tgju_scrape_payload()
+    scraped_prices = _extract_prices(scraped_payload)
+    provider_prices.update({symbol: scraped_prices[symbol] for symbol in missing})
+    return {
+        "prices": {symbol: {"value": str(provider_prices[symbol])} for symbol in SYMBOLS},
+        "timestamp": payload.get("timestamp") if isinstance(payload, dict) else None,
+    }
 
 
 class _TGJUPriceTableParser(HTMLParser):
@@ -312,7 +336,38 @@ def _fetch_tgju_profile_current(slug):
 
 
 def _fetch_tgju_local_tether_current():
-    """Read the first active USDT/IRR sell quote from TGJU's local market table."""
+    """Read the USDT/IRR rate from TGJU's JSON summary API (works from all IPs)."""
+    market_list_url = str(
+        _setting("TGJU_MARKET_LIST_API_URL", "https://api.tgju.org/v1/market/list-data")
+    )
+    # Primary: usdt-irr JSON API — accessible from non-Iranian IPs (e.g. Vercel)
+    try:
+        payload = _fetch_tgju_json(
+            str(_setting(
+                "TGJU_SUMMARY_API_URL",
+                "https://api.tgju.org/v1/market/indicator/summary-table-data",
+            )) + "/usdt-irr",
+            {
+                "lang": "fa",
+                "draw": "1",
+                "start": "0",
+                "length": "1",
+                "search": "",
+                "order_col": "timestamp",
+                "order_dir": "desc",
+                "from": "",
+                "to": "",
+                "convert_to_ad": "1",
+            },
+        )
+        rows = payload.get("data", [])
+        if rows:
+            value = _as_decimal(rows[0][3] if len(rows[0]) > 3 else rows[0][0])
+            if value is not None and value > Decimal("1000"):
+                return value
+    except ProviderError:
+        pass
+    # Fallback: HTML scraping (works on local server with Iranian IP)
     profile_base_url = str(_setting("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")).rstrip("/")
     rows = _scrape_tgju_page(f"{profile_base_url}/crypto-tether/markets-local")
     for row in rows:
@@ -373,6 +428,36 @@ def _extract_tgju_global_market_rows(html, slugs):
     return prices
 
 
+def _fetch_tgju_oil_current() -> Decimal:
+    """Fetch Brent crude oil price (USD) from TGJU's JSON summary API."""
+    payload = _fetch_tgju_json(
+        str(_setting(
+            "TGJU_SUMMARY_API_URL",
+            "https://api.tgju.org/v1/market/indicator/summary-table-data",
+        )) + "/oil_brent",
+        {
+            "lang": "fa",
+            "draw": "1",
+            "start": "0",
+            "length": "1",
+            "search": "",
+            "order_col": "timestamp",
+            "order_dir": "desc",
+            "from": "",
+            "to": "",
+            "convert_to_ad": "1",
+        },
+    )
+    rows = payload.get("data", [])
+    if not rows:
+        raise ProviderError("TGJU oil_brent API returned no rows")
+    # Summary table columns: open, low, high, close
+    value = _as_decimal(rows[0][3] if len(rows[0]) > 3 else rows[0][0])
+    if value is None:
+        raise ProviderError("TGJU oil_brent API returned unparseable value")
+    return value
+
+
 def _fetch_tgju_scrape_payload():
     market_list_url = str(
         _setting("TGJU_MARKET_LIST_API_URL", "https://api.tgju.org/v1/market/list-data")
@@ -393,21 +478,39 @@ def _fetch_tgju_scrape_payload():
             {"category_ids": category_id, "extra_data": "1", "lang": "fa"},
         )
 
-    def fetch_local_markets():
+    def fetch_coin_markets():
+        """Fetch coins (sekeb/nim/rob) via JSON API — works from non-Iranian IPs."""
+        coin_payload = fetch_market_list(_setting("TGJU_COIN_CATEGORY_ID", "28068"))
+        prices = _extract_tgju_market_list(coin_payload, {"sekeb", "nim", "rob"})
+        return prices
+
+    def fetch_ounce_market():
+        """Fetch gold ounce (ons) via JSON API — works from non-Iranian IPs."""
+        global_payload = fetch_market_list(_setting("TGJU_GLOBAL_CATEGORY_ID", "28076"))
+        prices = _extract_tgju_market_list(global_payload, {"ons"})
+        if prices.get("ons") is not None:
+            return prices
+        # Fallback: HTML scraping (works on local server with Iranian IP)
         return _extract_tgju_market_rows(
             _fetch_tgju_html(local_markets_url),
-            {"sekeb", "nim", "rob", "ons"},
+            {"ons"},
         )
 
-    def fetch_global_markets():
-        return _extract_tgju_global_market_rows(_fetch_tgju_html(global_markets_url), {"oil_brent"})
+    def fetch_oil_market():
+        """Fetch Brent oil price via JSON API — works from non-Iranian IPs."""
+        try:
+            return {"oil_brent": _fetch_tgju_oil_current()}
+        except ProviderError:
+            # Fallback: HTML scraping (works on local server with Iranian IP)
+            return _extract_tgju_global_market_rows(_fetch_tgju_html(global_markets_url), {"oil_brent"})
 
     extracted = {}
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    with ThreadPoolExecutor(max_workers=7) as executor:
         gold_future = executor.submit(fetch_market_list, _setting("TGJU_GOLD_CATEGORY_ID", "91818"))
         currency_future = executor.submit(fetch_market_list, _setting("TGJU_CURRENCY_CATEGORY_ID", "28070"))
-        local_future = executor.submit(fetch_local_markets)
-        global_future = executor.submit(fetch_global_markets)
+        coin_future = executor.submit(fetch_coin_markets)
+        ounce_future = executor.submit(fetch_ounce_market)
+        oil_future = executor.submit(fetch_oil_market)
         profile_futures = {
             "silver": executor.submit(_fetch_tgju_profile_current, "silver_999"),
             "tether": executor.submit(_fetch_tgju_local_tether_current),
@@ -425,16 +528,17 @@ def _fetch_tgju_scrape_payload():
         extracted.update(
             {"usd": currency_prices.get("price_dollar_rl"), "eur": currency_prices.get("price_eur")}
         )
-        local_prices = local_future.result()
+        coin_prices = coin_future.result()
         extracted.update(
             {
-                "coin_full": local_prices.get("sekeb"),
-                "coin_half": local_prices.get("nim"),
-                "coin_quarter": local_prices.get("rob"),
-                "ounce": local_prices.get("ons"),
+                "coin_full": coin_prices.get("sekeb"),
+                "coin_half": coin_prices.get("nim"),
+                "coin_quarter": coin_prices.get("rob"),
             }
         )
-        extracted["oil"] = global_future.result().get("oil_brent")
+        ounce_prices = ounce_future.result()
+        extracted["ounce"] = ounce_prices.get("ons")
+        extracted["oil"] = oil_future.result().get("oil_brent")
         for symbol, future in profile_futures.items():
             extracted[symbol] = future.result()
 

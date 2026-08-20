@@ -191,7 +191,17 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MARKET_PROVIDER = _env_text("MARKET_PROVIDER", "tgju_scrape").lower()
 MARKET_PROVIDER_URL = _env_text("MARKET_PROVIDER_URL")
 MARKET_PROVIDER_TOKEN = _env_text("MARKET_PROVIDER_TOKEN")
-MARKET_PROVIDER_ITEMS = _env_text("MARKET_PROVIDER_ITEMS", "usd,eur,geram18,geram24,silver_999")
+_default_market_provider_items = (
+    "usd,eur,geram18,geram24,silver_999,crypto-tether,sekeb,nim,rob,ons,energy-brent-oil"
+)
+_configured_market_items = _env_text("MARKET_PROVIDER_ITEMS")
+MARKET_PROVIDER_ITEMS = ",".join(
+    dict.fromkeys(
+        item.strip()
+        for item in f"{_configured_market_items},{_default_market_provider_items}".split(",")
+        if item.strip()
+    )
+)
 MARKET_PROVIDER_UNIT = _env_text("MARKET_PROVIDER_UNIT", "rial").lower()
 MARKET_DISPLAY_UNIT = _env_text("MARKET_DISPLAY_UNIT", "toman").lower()
 MARKET_PRICE_CACHE_SECONDS = _env_int("MARKET_PRICE_CACHE_SECONDS", 5, minimum=0)
