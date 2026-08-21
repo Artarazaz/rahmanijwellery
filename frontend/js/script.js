@@ -254,4 +254,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadMarketData();
     window.setInterval(loadMarketData, 5000);
+
+    // Consultation modal.
+    const consultationModal = document.getElementById('consultation-modal');
+    const modalCloseButton = document.getElementById('modal-close');
+    const modalTriggers = document.querySelectorAll('.modal-trigger[data-modal="consultation"]');
+    let lastFocusedElement = null;
+
+    const openConsultationModal = () => {
+        if (!consultationModal) return;
+        lastFocusedElement = document.activeElement;
+        consultationModal.classList.add('is-open');
+        consultationModal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        modalCloseButton?.focus();
+    };
+
+    const closeConsultationModal = () => {
+        if (!consultationModal) return;
+        consultationModal.classList.remove('is-open');
+        consultationModal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        if (lastFocusedElement instanceof HTMLElement) lastFocusedElement.focus();
+    };
+
+    modalTriggers.forEach((trigger) => trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        openConsultationModal();
+    }));
+
+    modalCloseButton?.addEventListener('click', closeConsultationModal);
+    consultationModal?.addEventListener('click', (event) => {
+        if (event.target === consultationModal) closeConsultationModal();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && consultationModal?.classList.contains('is-open')) closeConsultationModal();
+    });
 });
