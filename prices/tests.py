@@ -152,10 +152,11 @@ class MarketApiTests(TestCase):
     def test_tgju_tether_parser_uses_json_api_first(self, fetch_json):
         """Primary path: reads USDT/IRR from JSON summary API (works on Vercel)."""
         fetch_json.return_value = {
-            "data": [["274,000", "270,000", "274,000", "273,000"]],
-            "recordsTotal": 45,
+            "data": [
+                ['<a href="profile/price_dollar_rl">دلار</a>', '<span dir="ltr">605,000</span>']
+            ]
         }
-        self.assertEqual(_fetch_tgju_local_tether_current(), Decimal("273000"))
+        self.assertEqual(_fetch_tgju_local_tether_current(), Decimal("605000"))
 
     @patch("prices.services._scrape_tgju_page")
     @patch("prices.services._fetch_tgju_json", side_effect=ProviderError("JSON API unavailable"))

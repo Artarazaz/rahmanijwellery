@@ -336,35 +336,22 @@ def _fetch_tgju_profile_current(slug):
 
 
 def _fetch_tgju_local_tether_current():
-    """Read the USDT/IRR rate from TGJU's JSON summary API (works from all IPs)."""
+    """Read the USDT/IRR rate mimicking the live price (using price_dollar_rl)."""
+    # Real live tether in Iran closely tracks the free market USD (price_dollar_rl).
+    # Since specific tether slugs on TGJU APIs either return global rate ($1) or outdated 
+    # IRR values, we use the main currency list endpoint to grab price_dollar_rl as tether. 
     market_list_url = str(
         _setting("TGJU_MARKET_LIST_API_URL", "https://api.tgju.org/v1/market/list-data")
     )
-    # Primary: usdt-irr JSON API — accessible from non-Iranian IPs (e.g. Vercel)
     try:
         payload = _fetch_tgju_json(
-            str(_setting(
-                "TGJU_SUMMARY_API_URL",
-                "https://api.tgju.org/v1/market/indicator/summary-table-data",
-            )) + "/usdt-irr",
-            {
-                "lang": "fa",
-                "draw": "1",
-                "start": "0",
-                "length": "1",
-                "search": "",
-                "order_col": "timestamp",
-                "order_dir": "desc",
-                "from": "",
-                "to": "",
-                "convert_to_ad": "1",
-            },
+            market_list_url,
+            {"category_ids": _setting("TGJU_CURRENCY_CATEGORY_ID", "28070"), "extra_data": "1", "lang": "fa"},
         )
-        rows = payload.get("data", [])
-        if rows:
-            value = _as_decimal(rows[0][3] if len(rows[0]) > 3 else rows[0][0])
-            if value is not None and value > Decimal("1000"):
-                return value
+        prices = _extract_tgju_market_list(payload, {"price_dollar_rl"})
+        value = prices.get("price_dollar_rl")
+        if value is not None and value > Decimal("1000"):
+            return value
     except ProviderError:
         pass
     # Fallback: HTML scraping (works on local server with Iranian IP)
