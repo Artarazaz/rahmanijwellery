@@ -336,25 +336,29 @@ def _fetch_tgju_profile_current(slug):
 
 
 def _fetch_tgju_local_tether_current():
-    """Read the USDT/IRR rate mimicking the live price (using price_dollar_rl)."""
-    # Real live tether in Iran closely tracks the free market USD (price_dollar_rl).
-    # Since specific tether slugs on TGJU APIs either return global rate ($1) or outdated 
-    # IRR values, we use the main currency list endpoint to grab price_dollar_rl as tether. 
-    market_list_url = str(
-        _setting("TGJU_MARKET_LIST_API_URL", "https://api.tgju.org/v1/market/list-data")
-    )
+    """Read the USDT/IRR rate accurately using Ramzinex API since TGJU crypto API fails."""
+    # TGJU displays a tether rate that matches local crypto exchanges directly.
+    # Ramzinex returns USDT/IRR accurately (e.g. 605,000 IRR) representing live market.
+    # We'll use Ramzinex as the primary tether resolver for robustness on Vercel.
     try:
-        payload = _fetch_tgju_json(
-            market_list_url,
-            {"category_ids": _setting("TGJU_CURRENCY_CATEGORY_ID", "28070"), "extra_data": "1", "lang": "fa"},
+        req = urllib.request.Request(
+            "https://ramzinex.com/exchange/api/v1.0/exchange/pairs",
+            headers={"User-Agent": "Mozilla/5.0"}
         )
-        prices = _extract_tgju_market_list(payload, {"price_dollar_rl"})
-        value = prices.get("price_dollar_rl")
-        if value is not None and value > Decimal("1000"):
-            return value
-    except ProviderError:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read())
+            # Find the USDT/IRR pair (tether/rial commonly identified by base USDT and quote IRR/TMN)
+            for pair in data.get("data", []):
+                base_sym = pair.get("base_currency_symbol", {}).get("en", "").lower()
+                url_name = pair.get("url_name", "").lower()
+                if base_sym == "usdt" and ("irt" in url_name or "irr" in url_name or "toman" in url_name or "tether-usdt" in url_name):
+                    sell_value = _as_decimal(pair.get("sell"))
+                    if sell_value:
+                        return sell_value
+    except Exception as e:
         pass
-    # Fallback: HTML scraping (works on local server with Iranian IP)
+    
+    # Fallback to HTML scraping local-markets if Ramzinex fails (works on local IP)
     profile_base_url = str(_setting("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")).rstrip("/")
     rows = _scrape_tgju_page(f"{profile_base_url}/crypto-tether/markets-local")
     for row in rows:
@@ -364,7 +368,7 @@ def _fetch_tgju_local_tether_current():
         value = _as_decimal(cells[2])
         if value is not None:
             return value
-    raise ProviderError("TGJU local tether market has no active USDT/IRR quote")
+    raise ProviderError("Could not fetch local tether price from primary or fallback")
 
 
 def _extract_tgju_market_list(payload, slugs):
