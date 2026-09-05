@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (canvas && window.Chart) {
         const ctx = canvas.getContext('2d');
         normalChartGradient = ctx.createLinearGradient(0, 0, 0, 300);
-        normalChartGradient.addColorStop(0, 'rgba(232, 176, 138, .28)');
-        normalChartGradient.addColorStop(1, 'rgba(232, 176, 138, 0)');
+        normalChartGradient.addColorStop(0, 'rgba(212, 165, 116, .28)');
+        normalChartGradient.addColorStop(1, 'rgba(212, 165, 116, 0)');
         fullscreenChartGradient = ctx.createLinearGradient(0, 0, 0, 300);
-        fullscreenChartGradient.addColorStop(0, 'rgba(240, 200, 160, .38)');
-        fullscreenChartGradient.addColorStop(.55, 'rgba(232, 176, 138, .24)');
-        fullscreenChartGradient.addColorStop(1, 'rgba(232, 176, 138, .15)');
+        fullscreenChartGradient.addColorStop(0, 'rgba(232, 196, 154, .38)');
+        fullscreenChartGradient.addColorStop(.55, 'rgba(212, 165, 116, .24)');
+        fullscreenChartGradient.addColorStop(1, 'rgba(212, 165, 116, .15)');
 
         Chart.defaults.font.family = 'Vazirmatn';
         Chart.defaults.color = '#b8a99a';
@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'line',
             data: {
                 labels: [],
-                datasets: [{ data: [], borderColor: '#f0c8a0', backgroundColor: normalChartGradient, borderWidth: 1.5, pointBackgroundColor: '#0d0c0b', pointBorderColor: '#f0c8a0', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, fill: true, tension: .42 }]
+                datasets: [{ data: [], borderColor: '#e8c49a', backgroundColor: normalChartGradient, borderWidth: 1.5, pointBackgroundColor: '#2a2523', pointBorderColor: '#e8c49a', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, fill: true, tension: .42 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { backgroundColor: '#211d18', borderColor: 'rgba(232,176,138,.4)', borderWidth: 1, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, padding: 12, displayColors: false, callbacks: { label: (context) => `${formatMoney(context.raw)} تومان` } }
+                    tooltip: { backgroundColor: '#1a1614', borderColor: 'rgba(212,165,116,.4)', borderWidth: 1, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, padding: 12, displayColors: false, callbacks: { label: (context) => `${formatMoney(context.raw)} تومان` } }
                 },
                 scales: {
                     x: { grid: { display: false }, ticks: { font: { size: 9 } } },

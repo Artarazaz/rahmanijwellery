@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <meta name="theme-color" content="#312f30">
+    <meta name="theme-color" content="#2a2523">
     <title>رحمانی | خانه جواهر</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,6 +103,95 @@
                 <span class="ticker-item">انس جهانی <b>—</b></span>
             </div>
         </div>
+
+        <!-- Category Grid (Reference: Rings, Earrings, Necklace, Bracelets) -->
+        <section class="section-wrap" id="categories" style="padding-top: 80px;">
+            <div class="z-divider"><span class="ln"></span><svg class="diamond" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span class="ln"></span></div>
+            <div class="z-section-head">
+                <h2>کالکشن‌ها</h2>
+                <p>تمام سبک‌هایی که در گالری رحمانی ساخته می‌شوند.</p>
+            </div>
+            <div class="cat-grid">
+                <a href="/products/?category=ring" class="cat-tile"><span>انگشتر</span></a>
+                <a href="/products/?category=earring" class="cat-tile"><span>گوشواره</span></a>
+                <a href="/products/?category=necklace" class="cat-tile"><span>گردنبند</span></a>
+                <a href="/products/?category=bracelet" class="cat-tile"><span>دستبند</span></a>
+            </div>
+        </section>
+
+        <!-- Zigzag Feature Rows -->
+        <section class="section-wrap" style="padding-top: 20px;">
+            <div class="feature-list">
+                <div class="feature-row">
+                    <div class="feature-item">
+                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><path d="M12 3l2.5 5 5.5.7-4 4 1 5.5L12 15.8 6.9 18.2l1-5.5-4-4L9.5 8z" stroke-linejoin="round"/></svg></div></div>
+                        <div class="feature-body">
+                            <h3>خلوت الماس</h3>
+                            <p>مجموعه‌ای که ظرافت الماس تراش‌خورده را با خطوطی ساده و امروزی ترکیب می‌کند.</p>
+                            <a href="/products/" class="btn-cut">مشاهده جزئیات</a>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><circle cx="12" cy="14" r="6"/><path d="M9 9l3-5 3 5" stroke-linejoin="round"/></svg></div></div>
+                        <div class="feature-body">
+                            <h3>افسون نقره‌ای</h3>
+                            <p>الهام‌گرفته از حس آزاد طبیعت؛ برای کسانی که جواهر را همراه شخصیتشان می‌خواهند.</p>
+                            <a href="/products/" class="btn-cut">مشاهده جزئیات</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-row reverse">
+                    <div class="feature-item">
+                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><path d="M4 7c4 5 12 5 16 0"/><path d="M8 11c2.5 2.5 5.5 2.5 8 0"/></svg></div></div>
+                        <div class="feature-body">
+                            <h3>بهشت دونفره</h3>
+                            <p>مجموعه‌ای برای جشن پیوندی ماندگار؛ طراحی‌شده برای دو نفر که یک قصه را می‌سازند.</p>
+                            <a href="/products/" class="btn-cut">مشاهده جزئیات</a>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><rect x="4" y="9" width="16" height="6" rx="3"/></svg></div></div>
+                        <div class="feature-body">
+                            <h3>گدازه طلا</h3>
+                            <p>مجموعه‌ای درخشان که حس طلای مذاب را در قطعاتی روان و امروزی بازتاب می‌دهد.</p>
+                            <a href="/products/" class="btn-cut">مشاهده جزئیات</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Showcase Carousel ("Our Best Feature") -->
+        <section class="section-wrap" style="padding-top: 40px; padding-bottom: 40px;">
+            <div class="showcase-head">
+                <div class="section-head" style="text-align:right; margin:0;">
+                    <h2>برگزیده‌های رحمانی</h2>
+                    <p>نگاهی به تازه‌ترین قطعات گالری.</p>
+                </div>
+                <div class="arrow-pair">
+                    <button class="arrow-btn arrow-prev" onclick="document.getElementById('showcase').scrollBy({left:-240,behavior:'smooth'})"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+                    <button class="arrow-btn arrow-next" onclick="document.getElementById('showcase').scrollBy({left:240,behavior:'smooth'})"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+                </div>
+            </div>
+            <div class="showcase-track" id="showcase">
+                <div class="showcase-card">
+                    <div class="showcase-img"><span class="showcase-tag">جدید</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><circle cx="12" cy="14" r="6"/><path d="M9 9l3-5 3 5" stroke-linejoin="round"/></svg></div>
+                    <div class="showcase-info"><h4>انگشتر مهتاب</h4><span>طلای ۱۸ عیار</span></div>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img"><span class="showcase-tag">دست‌ساز</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><path d="M12 3l2.5 5 5.5.7-4 4 1 5.5L12 15.8 6.9 18.2l1-5.5-4-4L9.5 8z" stroke-linejoin="round"/></svg></div>
+                    <div class="showcase-info"><h4>گوشواره ستاره سحر</h4><span>طلای رزگلد</span></div>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img"><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><rect x="4" y="9" width="16" height="6" rx="3"/></svg></div>
+                    <div class="showcase-info"><h4>دستبند رشته زرین</h4><span>طلای ۱۸ عیار</span></div>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img"><span class="showcase-tag">جدید</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><path d="M4 7c4 5 12 5 16 0"/><circle cx="12" cy="16" r="2.2"/></svg></div>
+                    <div class="showcase-info"><h4>گردنبند دو ردیفه</h4><span>طلای زرد و سفید</span></div>
+                </div>
+            </div>
+        </section>
 
         <section class="statement section-wrap reveal" aria-label="بیانیه برند">
             <div class="statement-line"></div>

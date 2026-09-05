@@ -5,16 +5,16 @@
 
 /* -------------------- 1. Design Tokens -------------------- */
 :root {
-  --z-bg: #312f30;
+  --z-bg: #2a2523;
   --z-cream: #fff4e9;
   --z-offwhite: #fff9ee;
-  --z-ink-dark: #312f30;
-  --z-peach: #e8b08a;
-  --z-peach-line: rgba(232, 176, 138, 0.22);
+  --z-ink-dark: #2a2523;
+  --z-peach: #d4a574;
+  --z-peach-line: rgba(212, 165, 116, 0.22);
   --z-muted: #cacaca;
   --z-muted-2: #8f8f8f;
-  --z-card-img: #4d433e;
-  --z-card-text: #1d1917;
+  --z-card-img: #463e39;
+  --z-card-text: #1a1614;
   --z-white: #ffffff;
 }
 
@@ -127,7 +127,7 @@
   border-radius: 0 190px 0 0;
   border: 1px solid var(--z-peach);
   background:
-    radial-gradient(circle at 35% 25%, rgba(232, 176, 138, 0.22), transparent 55%),
+    radial-gradient(circle at 35% 25%, rgba(212, 165, 116, 0.22), transparent 55%),
     linear-gradient(155deg, #443c37, #262220);
   overflow: hidden;
 }
@@ -409,7 +409,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(232, 176, 138, 0.4);
+  background: rgba(212, 165, 116, 0.4);
   border: 1px solid var(--z-peach);
   border-radius: 20px;
   padding: 4px 12px;
