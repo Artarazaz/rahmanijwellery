@@ -2,72 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = window.MARKET_API_BASE_URL || (window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '');
     const apiUrl = (path) => `${API_BASE_URL}${path}`;
     const formatMoney = (number) => new Intl.NumberFormat('fa-IR').format(number);
-    const toPersianDigits = (value) => String(value).replace(/[0-9]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[digit]);
+    const toPersianDigits = (value) => String(value).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
     const unitLabels = { toman: 'تومان', rial: 'ریال', usd: 'دلار' };
+    const calculateProductPrices = () => window.Rahmani?.calculateProductPrices?.();
 
-    // Product prices are recalculated whenever the live 18K value changes.
-    const calculateProductPrices = () => {
-        const liveGold = document.getElementById('live-gold-price');
-        const rawGoldPrice = Number.parseFloat(liveGold?.dataset.rawPrice || '0');
-
-        document.querySelectorAll('.product-card').forEach((product) => {
-            const price = product.querySelector('.final-price');
-            if (!price) return;
-            if (!Number.isFinite(rawGoldPrice) || rawGoldPrice <= 0) {
-                price.textContent = 'در انتظار نرخ زنده';
-                return;
-            }
-            const weight = Number.parseFloat(product.dataset.weight) || 0;
-            const makingCharge = Number.parseFloat(product.dataset.makingCharge) || 0;
-            const profitPercent = Number.parseFloat(product.dataset.profit) || 7;
-            const preProfit = (weight * rawGoldPrice) + makingCharge;
-            const finalPrice = Math.round(preProfit + ((preProfit * profitPercent) / 100));
-            price.innerHTML = `${formatMoney(finalPrice)} <small>تومان</small>`;
-        });
-    };
-
-    calculateProductPrices();
-
-    // Mobile navigation.
-    const menuToggle = document.getElementById('menu-toggle');
-    const mainNav = document.getElementById('main-nav');
-    if (menuToggle && mainNav) {
-        menuToggle.addEventListener('click', () => {
-            const isOpen = mainNav.classList.toggle('is-open');
-            menuToggle.setAttribute('aria-expanded', String(isOpen));
-            menuToggle.innerHTML = isOpen ? '<i class="ph ph-x"></i>' : '<i class="ph ph-list"></i>';
-        });
-
-        mainNav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
-            mainNav.classList.remove('is-open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-            menuToggle.innerHTML = '<i class="ph ph-list"></i>';
-        }));
-    }
-
-    const siteHeader = document.getElementById('site-header');
-    window.addEventListener('scroll', () => siteHeader?.classList.toggle('scrolled', window.scrollY > 20), { passive: true });
-
-    // Lightweight entrance motion for an editorial first impression.
-    const revealItems = document.querySelectorAll('.reveal');
-    if ('IntersectionObserver' in window) {
-        const revealObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12 });
-        revealItems.forEach((item) => revealObserver.observe(item));
-    } else {
-        revealItems.forEach((item) => item.classList.add('is-visible'));
-    }
-
-    // Chart.js is fed only by saved market snapshots; no mock values are used.
+    // ── Chart setup ──
     const canvas = document.getElementById('priceChart');
     const chartContainer = canvas?.closest('.chart-container');
-    const chartFallback = chartContainer?.querySelector('.chart-fallback');
     const chartDataSources = {
         hourly: { labels: [], data: [] },
         daily: { labels: [], data: [] },
@@ -92,37 +33,38 @@ document.addEventListener('DOMContentLoaded', () => {
     if (canvas && window.Chart) {
         const ctx = canvas.getContext('2d');
         normalChartGradient = ctx.createLinearGradient(0, 0, 0, 300);
-        normalChartGradient.addColorStop(0, 'rgba(184, 149, 86, .28)');
-        normalChartGradient.addColorStop(1, 'rgba(184, 149, 86, 0)');
+        normalChartGradient.addColorStop(0, 'rgba(232, 176, 138, .28)');
+        normalChartGradient.addColorStop(1, 'rgba(232, 176, 138, 0)');
         fullscreenChartGradient = ctx.createLinearGradient(0, 0, 0, 300);
-        fullscreenChartGradient.addColorStop(0, 'rgba(214, 182, 109, .38)');
-        fullscreenChartGradient.addColorStop(.55, 'rgba(184, 149, 86, .24)');
-        fullscreenChartGradient.addColorStop(1, 'rgba(184, 149, 86, .15)');
+        fullscreenChartGradient.addColorStop(0, 'rgba(240, 200, 160, .38)');
+        fullscreenChartGradient.addColorStop(.55, 'rgba(232, 176, 138, .24)');
+        fullscreenChartGradient.addColorStop(1, 'rgba(232, 176, 138, .15)');
 
         Chart.defaults.font.family = 'Vazirmatn';
-        Chart.defaults.color = '#81786e';
+        Chart.defaults.color = '#b8a99a';
         priceChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: [],
-                datasets: [{ data: [], borderColor: '#d6b66d', backgroundColor: normalChartGradient, borderWidth: 1.5, pointBackgroundColor: '#0d0c0b', pointBorderColor: '#d6b66d', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, fill: true, tension: .42 }]
+                datasets: [{ data: [], borderColor: '#f0c8a0', backgroundColor: normalChartGradient, borderWidth: 1.5, pointBackgroundColor: '#0d0c0b', pointBorderColor: '#f0c8a0', pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, fill: true, tension: .42 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { backgroundColor: '#211d18', borderColor: 'rgba(184,149,86,.4)', borderWidth: 1, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, padding: 12, displayColors: false, callbacks: { label: (context) => `${formatMoney(context.raw)} تومان` } }
+                    tooltip: { backgroundColor: '#211d18', borderColor: 'rgba(232,176,138,.4)', borderWidth: 1, titleFont: { family: 'Vazirmatn' }, bodyFont: { family: 'Vazirmatn' }, padding: 12, displayColors: false, callbacks: { label: (context) => `${formatMoney(context.raw)} تومان` } }
                 },
                 scales: {
                     x: { grid: { display: false }, ticks: { font: { size: 9 } } },
-                    y: { grid: { color: 'rgba(232,226,215,.07)' }, border: { display: false }, ticks: { font: { size: 9 }, callback: (value) => formatMoney(value) } }
+                    y: { grid: { color: 'rgba(255,244,233,.07)' }, border: { display: false }, ticks: { font: { size: 9 }, callback: (value) => formatMoney(value) } }
                 },
                 interaction: { intersect: false, mode: 'index' }
             }
         });
     }
 
+    // ── Render helpers ──
     const renderTrend = (card, change) => {
         const trend = card?.querySelector('.trend');
         if (!trend) return;
@@ -139,37 +81,55 @@ document.addEventListener('DOMContentLoaded', () => {
         trend.innerHTML = `<i class="ph ${icon}"></i> ${prefix}${toPersianDigits(numericChange.toFixed(2))}٪ نسبت به اولین قیمت امروز`;
     };
 
-    const renderMarket = (payload) => {
+    const renderMarket = (prices) => {
         const marketMap = {
             gold18: 'live-gold-price',
             gold24: 'live-gold24-price',
             usd: 'live-dollar-price',
             eur: 'live-euro-price',
-            silver: 'live-silver-price',
+            dirham: 'live-dirham-price',
             tether: 'live-tether-price',
+            silver: 'live-silver-price',
             coin_full: 'live-coin-full-price',
+            coin_old: 'live-coin-old-price',
             coin_half: 'live-coin-half-price',
             coin_quarter: 'live-coin-quarter-price',
             ounce: 'live-ounce-price',
+            silver_ounce: 'live-silver-ounce-price',
             oil: 'live-oil-price'
         };
+        const globalSymbols = new Set(['ounce', 'silver_ounce', 'oil']);
         Object.entries(marketMap).forEach(([symbol, id]) => {
             const element = document.getElementById(id);
             const card = element?.closest('.price-card');
-            const price = payload.prices?.[symbol];
-            if (!element || !price || !Number.isFinite(Number(price.value))) return;
-            const displayUnit = unitLabels[price.unit] || unitLabels[payload.unit] || price.unit || payload.unit || 'تومان';
-            element.dataset.rawPrice = String(price.value);
-            element.innerHTML = `${formatMoney(Number(price.value))} <small>${displayUnit}</small>`;
-            renderTrend(card, price.change_percent);
+            const value = prices[symbol];
+            if (!element || value == null || !Number.isFinite(Number(value))) return;
+            const isGlobal = globalSymbols.has(symbol);
+            const displayValue = isGlobal ? Number(value) : Math.round(Number(value) / 10);
+            const unit = isGlobal ? 'دلار' : 'تومان';
+            element.dataset.rawPrice = String(value);
+            element.textContent = formatMoney(displayValue);
+            const unitEl = card?.querySelector('.price-unit');
+            if (unitEl) unitEl.textContent = unit;
+            renderTrend(card, null);
         });
         calculateProductPrices();
 
-        Object.entries(payload.chart || {}).forEach(([period, source]) => setChartData(period, source));
+        // Populate ticker strip
+        const tickerGold18 = document.getElementById('ticker-gold18');
+        const tickerGold24 = document.getElementById('ticker-gold24');
+        const tickerCoin = document.getElementById('ticker-coin');
+        const tickerUsd = document.getElementById('ticker-usd');
+        const tickerOunce = document.getElementById('ticker-ounce');
+        if (tickerGold18 && prices.gold18) tickerGold18.textContent = formatMoney(Math.round(prices.gold18 / 10)) + ' تومان';
+        if (tickerGold24 && prices.gold24) tickerGold24.textContent = formatMoney(Math.round(prices.gold24 / 10)) + ' تومان';
+        if (tickerCoin && prices.coin_full) tickerCoin.textContent = formatMoney(Math.round(prices.coin_full / 10)) + ' تومان';
+        if (tickerUsd && prices.usd) tickerUsd.textContent = formatMoney(Math.round(prices.usd / 10)) + ' تومان';
+        if (tickerOunce && prices.ounce) tickerOunce.textContent = '$' + formatMoney(prices.ounce);
+
         const status = document.querySelector('.market-status');
         if (status) {
-            status.classList.toggle('is-stale', Boolean(payload.stale));
-            status.classList.toggle('is-error', false);
+            status.classList.remove('is-stale', 'is-error');
         }
     };
 
@@ -180,23 +140,136 @@ document.addEventListener('DOMContentLoaded', () => {
         status.classList.add('is-error');
     };
 
+    // ── Pure HTML web scraping from tgju.org ──
+    const PERSIAN_DIGITS_RE = /[۰-۹٠-٩]/g;
+    const persianToLatin = (ch) => {
+        const all = '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩';
+        const idx = all.indexOf(ch);
+        return idx >= 0 ? String(idx % 10) : ch;
+    };
+
+    const parsePrice = (text) => {
+        if (text == null) return null;
+        const cleaned = String(text).replace(/[,٬+%]/g, '').trim();
+        const match = cleaned.match(/-?\d+(?:\.\d+)?/);
+        if (!match) return null;
+        const n = Number(match[0]);
+        return Number.isFinite(n) ? n : null;
+    };
+
+    const normaliseText = (t) => t
+        .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+        .replace(/‌/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Symbol mapping: Persian label → internal symbol
+    const LABEL_MAP = [
+        ['طلای ۱۸ عیار', 'gold18'],
+        ['طلای 24 عیار', 'gold24'], ['طلای ۲۴ عیار', 'gold24'],
+        ['دلار', 'usd'],
+        ['یورو', 'eur'],
+        ['درهم امارات', 'dirham'], ['درهم', 'dirham'],
+        ['تتر', 'tether'],
+        ['سکه امامی', 'coin_full'],
+        ['سکه بهار آزادی', 'coin_old'],
+        ['نیم سکه', 'coin_half'],
+        ['ربع سکه', 'coin_quarter'],
+        ['نقره ۹۲۵', 'silver'], ['گرم نقره', 'silver'],
+        ['انس جهانی طلا', 'ounce'], ['انس طلا', 'ounce'],
+        ['انس نقره', 'silver_ounce'], ['انس جهانی نقره', 'silver_ounce'],
+        ['نفت برنت', 'oil'],
+    ];
+
+    const MR_MAP = {
+        geram18: 'gold18', geram24: 'gold24',
+        price_dollar_rl: 'usd', price_eur: 'eur',
+        price_aed: 'dirham', 'crypto-tether': 'tether',
+        sekee: 'coin_full', sekeb: 'coin_old',
+        nim: 'coin_half', rob: 'coin_quarter',
+        silver_999: 'silver',
+        ons: 'ounce', silver: 'silver_ounce',
+        oil_brent: 'oil',
+    };
+
+    const symbolForLabel = (label) => {
+        const norm = normaliseText(label);
+        if (!norm || norm.includes('ذاتی')) return null;
+        for (const [needle, symbol] of LABEL_MAP) {
+            if (norm.includes(needle)) return symbol;
+        }
+        return null;
+    };
+
+    const scrapeTGJUPricesFromHTML = async () => {
+        const resp = await fetch(apiUrl('/api/scrape-proxy/'), {
+            headers: { 'Accept': 'text/html' },
+        });
+        if (!resp.ok) throw new Error(`TGJU proxy ${resp.status}`);
+        const html = await resp.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const found = {};
+
+        // Extract from <tr> rows
+        doc.querySelectorAll('tr[data-market-row]').forEach(tr => {
+            const mr = tr.getAttribute('data-market-row');
+            const mapped = MR_MAP[mr];
+            if (mapped && found[mapped] == null) {
+                const dp = tr.getAttribute('data-price');
+                if (dp) {
+                    const v = parsePrice(dp);
+                    if (v != null) found[mapped] = v;
+                }
+            }
+        });
+
+        // Extract from table cells by label
+        doc.querySelectorAll('tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td, th');
+            if (cells.length < 2) return;
+            const label = cells[0].textContent;
+            const symbol = symbolForLabel(label);
+            if (symbol && found[symbol] == null) {
+                const v = parsePrice(cells[1].textContent);
+                if (v != null) found[symbol] = v;
+            }
+        });
+
+        // Extract from <li id="l-..."> ticker items
+        doc.querySelectorAll('li[id^="l-"]').forEach(li => {
+            const slug = li.id.replace(/^l-/, '');
+            const mapped = MR_MAP[slug];
+            if (mapped && found[mapped] == null) {
+                const priceEl = li.querySelector('.info-price, [class*="price"]');
+                if (priceEl) {
+                    const v = parsePrice(priceEl.textContent);
+                    if (v != null) found[mapped] = v;
+                }
+            }
+        });
+
+        return found;
+    };
+
+    // ── Main data loader ──
     let marketRequestInFlight = false;
     const loadMarketData = async () => {
         if (marketRequestInFlight) return;
         marketRequestInFlight = true;
         try {
-            const response = await fetch(apiUrl('/api/market/'), { headers: { Accept: 'application/json' } });
-            const payload = await response.json();
-            if (!response.ok) throw new Error(payload.error || 'Market API unavailable');
-            renderMarket(payload);
-        } catch (error) {
-            renderMarketError();
-            console.warn('Market API request failed', error);
+            const prices = await scrapeTGJUPricesFromHTML();
+            if (prices.gold18) {
+                renderMarket(prices);
+                return;
+            }
+        } catch (err) {
+            console.warn('TGJU scrape failed:', err);
         } finally {
             marketRequestInFlight = false;
         }
+        renderMarketError();
     };
 
+    // ── Chart period toggle ──
     document.querySelectorAll('.btn-toggle').forEach((button) => button.addEventListener('click', () => {
         document.querySelectorAll('.btn-toggle').forEach((item) => item.classList.remove('active'));
         button.classList.add('active');
@@ -210,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }));
 
-    // Fullscreen view for the market room.
+    // ── Fullscreen ──
     const fullscreenButton = document.getElementById('fullscreen-toggle');
     const fullscreenExitButton = document.getElementById('fullscreen-exit');
     const fullscreenTarget = document.querySelector('.market-board');
@@ -252,42 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFullscreenButton();
     updateChartGradient();
 
+    // ── Start: fetch every 5 seconds ──
     loadMarketData();
     window.setInterval(loadMarketData, 5000);
-
-    // Consultation modal.
-    const consultationModal = document.getElementById('consultation-modal');
-    const modalCloseButton = document.getElementById('modal-close');
-    const modalTriggers = document.querySelectorAll('.modal-trigger[data-modal="consultation"]');
-    let lastFocusedElement = null;
-
-    const openConsultationModal = () => {
-        if (!consultationModal) return;
-        lastFocusedElement = document.activeElement;
-        consultationModal.classList.add('is-open');
-        consultationModal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
-        modalCloseButton?.focus();
-    };
-
-    const closeConsultationModal = () => {
-        if (!consultationModal) return;
-        consultationModal.classList.remove('is-open');
-        consultationModal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-open');
-        if (lastFocusedElement instanceof HTMLElement) lastFocusedElement.focus();
-    };
-
-    modalTriggers.forEach((trigger) => trigger.addEventListener('click', (event) => {
-        event.preventDefault();
-        openConsultationModal();
-    }));
-
-    modalCloseButton?.addEventListener('click', closeConsultationModal);
-    consultationModal?.addEventListener('click', (event) => {
-        if (event.target === consultationModal) closeConsultationModal();
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && consultationModal?.classList.contains('is-open')) closeConsultationModal();
-    });
 });

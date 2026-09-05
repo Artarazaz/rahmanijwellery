@@ -1,17 +1,11 @@
 from django.core.management.base import BaseCommand
 
-from prices.services import seed_market_history
+from prices.services import refresh_market_snapshot
 
 
 class Command(BaseCommand):
-    help = "Seed chart history from TGJU's official daily and intraday data."
+    help = "Scrape current Moj3 prices so the chart has a first stored point."
 
     def handle(self, *args, **options):
-        counts = seed_market_history()
-        self.stdout.write(
-            self.style.SUCCESS(
-                "Saved TGJU history: "
-                f"{counts['intraday']} intraday, {counts['daily']} daily, "
-                f"{counts['monthly']} monthly points."
-            )
-        )
+        snapshot = refresh_market_snapshot()
+        self.stdout.write(self.style.SUCCESS(f"Saved Moj3 snapshot #{snapshot.pk}"))

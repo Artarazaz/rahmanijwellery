@@ -2,13 +2,17 @@ import json
 import os
 from datetime import timedelta
 from decimal import Decimal
+from io import BytesIO
 from unittest.mock import MagicMock, patch
 
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import OperationalError
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from PIL import Image
 
-from .models import MarketSnapshot
+from .models import MarketSnapshot, Product
 from .services import (
     ProviderError,
     _TGJUPriceTableParser,
@@ -229,3 +233,64 @@ class MarketApiTests(TestCase):
         self.assertFalse(payload["stale"])
         self.assertEqual(payload["prices"]["gold18"]["value"], 10500000)
         self.assertEqual(len(payload["chart"]["hourly"]["data"]), 1)
+
+
+class CatalogApiTests(TestCase):
+    def setUp(self):
+        self.staff = User.objects.create_user(username="studio", password="secret-pass", is_staff=True)
+
+    def test_public_catalog_lists_seeded_products_in_categories(self):
+        payload = self.client.get("/api/products/").json()
+        self.assertEqual(len(payload["products"]), 3)
+        self.assertTrue(any(item["id"] == "ring" for item in payload["categories"]))
+        rings = self.client.get("/api/products/?category=ring").json()
+        self.assertEqual(len(rings["products"]), 1)
+        self.assertEqual(rings["products"][0]["name"], "حلقه کلاسیک")
+
+    def test_unpublished_products_are_hidden_from_the_storefront(self):
+        Product.objects.filter(sku="R-018").update(is_published=False)
+        payload = self.client.get("/api/products/").json()
+        self.assertEqual(len(payload["products"]), 2)
+
+    def test_guest_cannot_create_products(self):
+        response = self.client.post("/api/studio/products/create/", {
+            "name": "گوشواره نور",
+            "category": "earring",
+            "weight": "3.2",
+            "making_charge": "250000",
+        })
+        self.assertEqual(response.status_code, 401)
+
+    def test_staff_can_add_a_product_with_images(self):
+        self.client.force_login(self.staff)
+        buffer = BytesIO()
+        Image.new("RGB", (24, 24), (180, 140, 80)).save(buffer, format="JPEG")
+        upload = SimpleUploadedFile("earring.jpg", buffer.getvalue(), content_type="image/jpeg")
+        response = self.client.post("/api/studio/products/create/", {
+            "name": "گوشواره نور",
+            "sku": "R-040",
+            "category": "earring",
+            "weight": "3.2",
+            "making_charge": "250000",
+            "profit": "7",
+            "note": "درخشش آرام",
+            "is_published": "true",
+            "images": upload,
+        })
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()
+        self.assertEqual(payload["category"], "earring")
+        self.assertEqual(len(payload["images"]), 1)
+        image = self.client.get(payload["images"][0]["url"])
+        self.assertEqual(image.status_code, 200)
+        catalog = self.client.get("/api/products/?category=earring").json()
+        self.assertEqual(catalog["products"][0]["name"], "گوشواره نور")
+
+    def test_products_page_is_available(self):
+        response = self.client.get("/products/")
+        self.assertEqual(response.status_code, 200)
+        body = b"".join(response.streaming_content)
+        self.assertIn(b"catalog-grid", body)
+        panel = self.client.get("/panel/")
+        self.assertEqual(panel.status_code, 200)
+

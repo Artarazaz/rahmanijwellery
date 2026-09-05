@@ -7,7 +7,7 @@ from prices.services import ProviderError, refresh_market_snapshot
 
 
 class Command(BaseCommand):
-    help = "Fetch market prices and persist a normalized snapshot."
+    help = "Scrape TGJU prices and persist a snapshot."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -18,25 +18,25 @@ class Command(BaseCommand):
         parser.add_argument(
             "--interval",
             type=int,
-            default=int(getattr(settings, "MARKET_UPDATE_INTERVAL_SECONDS", 5)),
+            default=int(getattr(settings, "MARKET_UPDATE_INTERVAL_SECONDS", 30)),
             help="Seconds between refreshes when --watch is enabled.",
         )
 
     def handle(self, *args, **options):
-        interval = max(1, options["interval"])
+        interval = max(5, options["interval"])
         while True:
             started = time.monotonic()
             try:
                 snapshot = refresh_market_snapshot()
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"Saved market snapshot #{snapshot.pk} at {snapshot.captured_at.isoformat()}"
+                        f"Saved Moj3 snapshot #{snapshot.pk} at {snapshot.captured_at.isoformat()}"
                     )
                 )
             except ProviderError as error:
-                self.stderr.write(self.style.ERROR(f"Market refresh failed: {error}"))
-            except Exception as error:  # Keep a transient network/parser error from killing the worker.
-                self.stderr.write(self.style.ERROR(f"Unexpected market refresh error: {error}"))
+                self.stderr.write(self.style.ERROR(f"Moj3 scrape failed: {error}"))
+            except Exception as error:
+                self.stderr.write(self.style.ERROR(f"Unexpected scrape error: {error}"))
 
             if not options["watch"]:
                 break

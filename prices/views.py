@@ -1,11 +1,12 @@
 import json
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
 from .models import GoldPrice
 from .services import ProviderError, get_history, get_market_data
+from .tgju import ProviderError as TgjuError, _fetch_html, TGJU_HOME
 
 
 @require_GET
@@ -78,3 +79,13 @@ def update_price(request, id):
         price.price = body["price"]
         price.save(update_fields=["price"])
     return JsonResponse({"message": "Price updated", "id": price.id, "price": str(price.price)})
+
+
+@require_GET
+def scrape_proxy(request):
+    """GET /api/scrape-proxy/ — server-side proxy that fetches tgju.org HTML for the frontend."""
+    try:
+        html = _fetch_html(TGJU_HOME)
+        return HttpResponse(html, content_type="text/html; charset=utf-8")
+    except TgjuError as error:
+        return JsonResponse({"error": str(error)}, status=502)

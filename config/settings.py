@@ -185,53 +185,26 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8001",
+    "http://localhost:8001",
+    "https://*.vercel.app",
+]
 
 
-# Market provider configuration. Keep credentials in the environment, never in frontend code.
-MARKET_PROVIDER = _env_text("MARKET_PROVIDER", "tgju_scrape").lower()
-MARKET_PROVIDER_URL = _env_text("MARKET_PROVIDER_URL")
-MARKET_PROVIDER_TOKEN = _env_text("MARKET_PROVIDER_TOKEN")
-_default_market_provider_items = (
-    "usd,eur,geram18,geram24,silver_999,crypto-tether,sekeb,nim,rob,ons,energy-brent-oil"
-)
-_configured_market_items = _env_text("MARKET_PROVIDER_ITEMS")
-MARKET_PROVIDER_ITEMS = ",".join(
-    dict.fromkeys(
-        item.strip()
-        for item in f"{_configured_market_items},{_default_market_provider_items}".split(",")
-        if item.strip()
-    )
-)
-MARKET_PROVIDER_UNIT = _env_text("MARKET_PROVIDER_UNIT", "rial").lower()
+# Market prices are scraped from TGJU (tgju.org) and stored as snapshots.
 MARKET_DISPLAY_UNIT = _env_text("MARKET_DISPLAY_UNIT", "toman").lower()
-MARKET_PRICE_CACHE_SECONDS = _env_int("MARKET_PRICE_CACHE_SECONDS", 5, minimum=0)
-MARKET_PROVIDER_TIMEOUT_SECONDS = _env_int("MARKET_PROVIDER_TIMEOUT_SECONDS", 8, minimum=1)
-MARKET_UPDATE_INTERVAL_SECONDS = _env_int("MARKET_UPDATE_INTERVAL_SECONDS", 5, minimum=1)
+MARKET_PROVIDER_TIMEOUT_SECONDS = _env_int("MARKET_PROVIDER_TIMEOUT_SECONDS", 12, minimum=1)
+MARKET_UPDATE_INTERVAL_SECONDS = _env_int("MARKET_UPDATE_INTERVAL_SECONDS", 5, minimum=5)
 MARKET_SNAPSHOT_STALE_AFTER_SECONDS = _env_int(
     "MARKET_SNAPSHOT_STALE_AFTER_SECONDS",
-    10 if _env_text("VERCEL") else 30,
+    15 if _env_text("VERCEL") else 30,
     minimum=1,
 )
-TGJU_SCRAPE_URL = _env_text("TGJU_SCRAPE_URL", "https://www.tgju.org/home")
-TGJU_SCRAPE_GOLD_URL = _env_text("TGJU_SCRAPE_GOLD_URL", "https://www.tgju.org/gold-chart")
-TGJU_PROFILE_BASE_URL = _env_text("TGJU_PROFILE_BASE_URL", "https://www.tgju.org/profile")
-TGJU_PROFILE_URL = _env_text("TGJU_PROFILE_URL", "https://www.tgju.org/profile/geram18")
-TGJU_LOCAL_MARKETS_URL = _env_text("TGJU_LOCAL_MARKETS_URL", "https://www.tgju.org/local-markets")
-TGJU_GLOBAL_MARKETS_URL = _env_text(
-    "TGJU_GLOBAL_MARKETS_URL",
-    "https://www.tgju.org/profile/crypto-page/markets-global",
-)
-TGJU_MARKET_LIST_API_URL = _env_text(
-    "TGJU_MARKET_LIST_API_URL",
-    "https://api.tgju.org/v1/market/list-data",
-)
-TGJU_GOLD_CATEGORY_ID = _env_text("TGJU_GOLD_CATEGORY_ID", "91818")
-TGJU_CURRENCY_CATEGORY_ID = _env_text("TGJU_CURRENCY_CATEGORY_ID", "28070")
-TGJU_HISTORY_API_URL = _env_text(
-    "TGJU_HISTORY_API_URL",
-    "https://api.tgju.org/v1/market/indicator/summary-table-data/geram18",
-)
-TGJU_HISTORY_PAGE_LENGTH = _env_int("TGJU_HISTORY_PAGE_LENGTH", 5000, minimum=7)
 
 
 # Email

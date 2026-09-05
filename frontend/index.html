@@ -3,12 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d0c0b">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="theme-color" content="#312f30">
     <title>رحمانی | خانه جواهر</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=20260821-modal-1">
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/zarnegar-design-system.css?v=20260905-z2">
+    <link rel="stylesheet" href="css/style.css?v=20260905-z2">
+    <link rel="stylesheet" href="css/catalog.css?v=20260905-z2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script type="module">
@@ -21,7 +26,9 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body>
+<body data-page="home">
+    <div id="page-shell">
+    <div class="page-lines"><i></i><i></i><i></i></div>
     <div class="announcement-bar">
         <span class="live-dot"></span>
         <span>ارسال رایگان و بسته‌بندی امضاشده برای سفارش‌های این هفته</span>
@@ -30,23 +37,19 @@
     </div>
 
     <header class="site-header" id="site-header">
-        <a class="brand" href="#home" aria-label="خانه جواهر رحمانی">
-            <span class="brand-mark">R</span>
-            <span class="brand-copy">
-                <strong>رحمانی</strong>
-                <small>JEWELRY HOUSE</small>
-            </span>
-        </a>
+        <div class="nav-inner">
+            <nav class="main-nav nav-group" id="main-nav" aria-label="ناوبری اصلی">
+                <a href="#market"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5-3 1.1-3 2.5 1.3 2.5 3 2.5 3-1.1 3-2.5"/></svg>نبض بازار</a>
+                <a href="#collections"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg>کالکشن‌ها</a>
+            </nav>
 
-        <nav class="main-nav" id="main-nav" aria-label="ناوبری اصلی">
-            <a href="#home">خانه</a>
-            <a href="#collections">کالکشن‌ها</a>
-            <a href="#market">نبض بازار</a>
-        </nav>
+            <a class="brand z-brand" href="#home" aria-label="خانه جواهر رحمانی">رحمانی</a>
 
-        <div class="header-actions">
-            <a class="header-link modal-trigger" href="#contact" data-modal="consultation">مشاوره اختصاصی <i
-                    class="ph ph-arrow-up-left"></i></a>
+            <div class="nav-group">
+                <a href="/products/"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg>نمونه‌کارها</a>
+                <a class="modal-trigger" href="#contact" data-modal="consultation"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v14H7l-3 3z"/></svg>تماس</a>
+            </div>
+
             <button class="menu-toggle" id="menu-toggle" type="button" aria-label="باز کردن منو" aria-expanded="false">
                 <i class="ph ph-list"></i>
             </button>
@@ -63,7 +66,7 @@
                     <p class="hero-description">جواهراتی برای لحظه‌هایی که قرار نیست فراموش شوند؛ طراحی‌شده با نگاه
                         امروز و ساخته‌شده برای نسل‌های بعد.</p>
                     <div class="hero-actions">
-                        <a class="button button-gold" href="#collections">کشف کالکشن <i
+                        <a class="button button-gold" href="/products/">کشف کالکشن <i
                                 class="ph ph-arrow-up-left"></i></a>
                         <a class="text-link modal-trigger" href="#contact" data-modal="consultation">مشاوره اختصاصی <i
                                 class="ph ph-arrow-left"></i></a>
@@ -77,22 +80,29 @@
 
                 <div class="hero-visual reveal reveal-delay">
                     <div class="hero-visual-frame">
-                        <div class="frame-corner frame-corner-top"></div>
                         <img src="assets/gold_necklace_1786118350826.png" alt="گردنبند طلای رحمانی"
                             fetchpriority="high">
-                        <div class="image-shade"></div>
-                        <div class="hero-stamp">
-                            <span>R</span>
-                            <small>EST. 1999</small>
-                        </div>
-                        <div class="hero-image-caption"><span>تک‌قطعه / ۰۱</span><span>طلای ۱۸ عیار</span></div>
                     </div>
-                    <div class="hero-orbit orbit-one"></div>
-                    <div class="hero-orbit orbit-two"></div>
                 </div>
             </div>
             <div class="scroll-cue"><span>پیمایش کنید</span><i class="ph ph-arrow-down"></i></div>
         </section>
+
+        <!-- Ticker Strip (Zarnegar) -->
+        <div class="ticker-strip">
+            <div class="ticker-track" id="ticker-track">
+                <span class="ticker-item">طلای ۱۸ عیار <b id="ticker-gold18">—</b></span>
+                <span class="ticker-item">طلای ۲۴ عیار <b id="ticker-gold24">—</b></span>
+                <span class="ticker-item">سکه امامی <b id="ticker-coin">—</b></span>
+                <span class="ticker-item">دلار <b id="ticker-usd">—</b></span>
+                <span class="ticker-item">انس جهانی <b id="ticker-ounce">—</b></span>
+                <span class="ticker-item">طلای ۱۸ عیار <b>—</b></span>
+                <span class="ticker-item">طلای ۲۴ عیار <b>—</b></span>
+                <span class="ticker-item">سکه امامی <b>—</b></span>
+                <span class="ticker-item">دلار <b>—</b></span>
+                <span class="ticker-item">انس جهانی <b>—</b></span>
+            </div>
+        </div>
 
         <section class="statement section-wrap reveal" aria-label="بیانیه برند">
             <div class="statement-line"></div>
@@ -113,73 +123,11 @@
                 <div class="section-heading-side">
                     <p>کالکشنی محدود از فرم‌های خالص و نورهای گرم؛ انتخاب‌شده برای سلیقه‌ای که تفاوت را در جزئیات
                         می‌بیند.</p>
-                    <a class="text-link" href="#contact">مشاهده کاتالوگ کامل <i class="ph ph-arrow-left"></i></a>
+                    <a class="text-link" href="/products/">مشاهده کاتالوگ کامل <i class="ph ph-arrow-left"></i></a>
                 </div>
             </div>
 
-            <div class="products-grid">
-                <!-- Django {{ for product in products }} -->
-                <article class="product-card product-card-featured reveal" data-weight="5.2" data-making-charge="450000"
-                    data-profit="7">
-                    <div class="product-media">
-                        <span class="product-index">۰۱ / ۰۳</span>
-                        <img src="assets/gold_ring_1786118338142.png" alt="انگشتر طلای مینیمال کلاسیک" loading="lazy">
-                        <div class="product-gradient"></div>
-                        <a class="product-action" href="#contact">مشاهده جزئیات <i class="ph ph-arrow-up-left"></i></a>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title-row">
-                            <h3>حلقه کلاسیک</h3><span>R-018</span>
-                        </div>
-                        <p class="product-note">فرمی بی‌زمان برای هر روز</p>
-                        <div class="product-data"><span><i class="ph ph-scales"></i> ۵.۲ گرم</span><span><i
-                                    class="ph ph-sparkle"></i> طلای ۱۸ عیار</span></div>
-                        <div class="calculated-price"><span>قیمت نهایی</span><strong class="final-price">در حال
-                                محاسبه...</strong></div>
-                    </div>
-                </article>
-
-                <article class="product-card reveal reveal-delay" data-weight="8.5" data-making-charge="600000"
-                    data-profit="7">
-                    <div class="product-media">
-                        <span class="product-index">۰۲ / ۰۳</span>
-                        <img src="assets/gold_necklace_1786118350826.png" alt="گردنبند طلای پرنسس" loading="lazy">
-                        <div class="product-gradient"></div>
-                        <a class="product-action" href="#contact">مشاهده جزئیات <i class="ph ph-arrow-up-left"></i></a>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title-row">
-                            <h3>گردنبند پرنسس</h3><span>R-024</span>
-                        </div>
-                        <p class="product-note">یک نقطه نور، نزدیک قلب</p>
-                        <div class="product-data"><span><i class="ph ph-scales"></i> ۸.۵ گرم</span><span><i
-                                    class="ph ph-sparkle"></i> طلای ۱۸ عیار</span></div>
-                        <div class="calculated-price"><span>قیمت نهایی</span><strong class="final-price">در حال
-                                محاسبه...</strong></div>
-                    </div>
-                </article>
-
-                <article class="product-card reveal reveal-delay-more" data-weight="12.0" data-making-charge="800000"
-                    data-profit="7">
-                    <div class="product-media">
-                        <span class="product-index">۰۳ / ۰۳</span>
-                        <img src="assets/gold_bracelet_1786118365180.png" alt="دستبند طلای لوکس" loading="lazy">
-                        <div class="product-gradient"></div>
-                        <a class="product-action" href="#contact">مشاهده جزئیات <i class="ph ph-arrow-up-left"></i></a>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title-row">
-                            <h3>دستبند خط نور</h3><span>R-031</span>
-                        </div>
-                        <p class="product-note">تعادل ظریف میان قدرت و سادگی</p>
-                        <div class="product-data"><span><i class="ph ph-scales"></i> ۱۲ گرم</span><span><i
-                                    class="ph ph-sparkle"></i> طلای ۱۸ عیار</span></div>
-                        <div class="calculated-price"><span>قیمت نهایی</span><strong class="final-price">در حال
-                                محاسبه...</strong></div>
-                    </div>
-                </article>
-                <!-- End Django for loop -->
-            </div>
+            <div class="products-grid" id="featured-products"></div>
         </section>
 
         <section class="market-section section-wrap" id="market">
@@ -201,68 +149,100 @@
                 <button id="fullscreen-exit" class="fullscreen-exit" type="button"
                     aria-label="خروج از حالت تمام صفحه"><i class="ph ph-x"></i></button>
                 <div class="price-cards">
+                    <!-- طلا -->
                     <div class="price-card">
                         <div class="price-card-label"><i class="ph ph-diamond"></i><span>طلای ۱۸ عیار</span></div>
-                        <h3 id="live-gold-price" data-raw-price="0">در انتظار داده <small>تومان</small></h3>
+                        <h3 id="live-gold-price" data-raw-price="0">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
                         <div class="price-card-label"><i class="ph ph-diamond"></i><span>طلای ۲۴ عیار</span></div>
-                        <h3 id="live-gold24-price">در انتظار داده <small>تومان</small></h3>
+                        <h3 id="live-gold24-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-currency-dollar"></i><span>دلار آمریکا</span>
-                        </div>
-                        <h3 id="live-dollar-price">در انتظار داده <small>تومان</small></h3>
+                        <div class="price-card-label"><i class="ph ph-globe-hemisphere-west"></i><span>انس طلا</span></div>
+                        <h3 id="live-ounce-price">در انتظار داده</h3>
+                        <div class="price-unit">دلار</div>
+                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
+                    </div>
+                    <!-- نقره -->
+                    <div class="price-card">
+                        <div class="price-card-label"><i class="ph ph-sparkle"></i><span>نقره ۹۲۵</span></div>
+                        <h3 id="live-silver-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-currency-eur"></i><span>یورو</span></div>
-                        <h3 id="live-euro-price">در انتظار داده <small>تومان</small></h3>
+                        <div class="price-card-label"><i class="ph ph-globe-hemisphere-west"></i><span>انس نقره</span></div>
+                        <h3 id="live-silver-ounce-price">در انتظار داده</h3>
+                        <div class="price-unit">دلار</div>
+                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
+                    </div>
+                    <!-- سکه‌ها -->
+                    <div class="price-card">
+                        <div class="price-card-label"><i class="ph ph-coin"></i><span>سکه طرح جدید</span></div>
+                        <h3 id="live-coin-full-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-sparkle"></i><span>نقره / هر گرم</span></div>
-                        <h3 id="live-silver-price">در انتظار داده <small>تومان</small></h3>
-                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
-                    </div>
-                    <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-currency-circle-dollar"></i><span>تتر</span></div>
-                        <h3 id="live-tether-price">در انتظار داده <small>تومان</small></h3>
-                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
-                    </div>
-                    <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-coin"></i><span>تمام سکه بهار آزادی</span></div>
-                        <h3 id="live-coin-full-price">در انتظار داده <small>تومان</small></h3>
+                        <div class="price-card-label"><i class="ph ph-coin"></i><span>سکه طرح قدیم</span></div>
+                        <h3 id="live-coin-old-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
                         <div class="price-card-label"><i class="ph ph-coin"></i><span>نیم سکه</span></div>
-                        <h3 id="live-coin-half-price">در انتظار داده <small>تومان</small></h3>
+                        <h3 id="live-coin-half-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
                         <div class="price-card-label"><i class="ph ph-coin"></i><span>ربع سکه</span></div>
-                        <h3 id="live-coin-quarter-price">در انتظار داده <small>تومان</small></h3>
+                        <h3 id="live-coin-quarter-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
+                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
+                    </div>
+                    <!-- ارزها -->
+                    <div class="price-card">
+                        <div class="price-card-label"><i class="ph ph-currency-dollar"></i><span>دلار</span></div>
+                        <h3 id="live-dollar-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                     <div class="price-card">
-                        <div class="price-card-label"><i class="ph ph-globe-hemisphere-west"></i><span>انس طلا</span>
-                        </div>
-                        <h3 id="live-ounce-price">در انتظار داده <small>دلار</small></h3>
+                        <div class="price-card-label"><i class="ph ph-currency-eur"></i><span>یورو</span></div>
+                        <h3 id="live-euro-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
+                    <div class="price-card">
+                        <div class="price-card-label"><i class="ph ph-coins"></i><span>درهم</span></div>
+                        <h3 id="live-dirham-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
+                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-card-label"><i class="ph ph-currency-circle-dollar"></i><span>تتر</span></div>
+                        <h3 id="live-tether-price">در انتظار داده</h3>
+                        <div class="price-unit">تومان</div>
+                        <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
+                    </div>
+                    <!-- انرژی -->
                     <div class="price-card">
                         <div class="price-card-label"><i class="ph ph-drop"></i><span>نفت برنت</span></div>
-                        <h3 id="live-oil-price">در انتظار داده <small>دلار</small></h3>
+                        <h3 id="live-oil-price">در انتظار داده</h3>
+                        <div class="price-unit">دلار</div>
                         <div class="trend neutral"><i class="ph ph-minus"></i> در انتظار مقایسه</div>
                     </div>
                 </div>
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <div><span class="chart-kicker">LIVE MARKET / ۱۸K GOLD</span>
+                        <div><span class="chart-kicker">LIVE MARKET / 18K GOLD</span>
                             <h3>روند تغییرات قیمت</h3>
                         </div>
                         <div class="chart-controls" role="group" aria-label="دوره نمودار">
@@ -279,7 +259,7 @@
                     </div>
                 </div>
             </div>
-            <div class="market-footer"><span>منبع داده: اتاق معاملات رحمانی</span><span>برای خروج از حالت تمام صفحه،
+            <div class="market-footer"><span>منبع داده: TGJU (tgju.org)</span><span>برای خروج از حالت تمام صفحه،
                     کلید Esc را بزنید.</span></div>
         </section>
 
@@ -304,7 +284,7 @@
                     href="mailto:info@rahmanijewelry.ir">info@rahmanijewelry.ir <i class="ph ph-arrow-up-left"></i></a>
             </div>
             <div class="footer-column">
-                <h3>دسترسی</h3><a href="#collections">کالکشن‌ها</a><a href="#market">نبض بازار</a><a
+                <h3>دسترسی</h3><a href="/products/">کالکشن‌ها</a><a href="#market">نبض بازار</a><a
                     href="#contact">تماس با ما</a>
             </div>
             <div class="footer-column">
@@ -320,6 +300,7 @@
         <div class="footer-bottom"><span>© ۱۴۰۵ خانه جواهر رحمانی</span><span>اصالت و زیبایی، تعهد ماست.</span><a
                 href="#home">بازگشت به بالا <i class="ph ph-arrow-up"></i></a></div>
     </footer>
+    </div><!-- /page-shell -->
 
     <div id="consultation-modal" class="modal-overlay" aria-hidden="true">
         <div class="modal-content">
@@ -344,7 +325,22 @@
         </div>
     </div>
 
-    <script src="js/script.js?v=20260821-modal-1"></script>
+    <div id="product-modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content">
+            <button class="modal-close" type="button" aria-label="بستن"><i class="ph ph-x"></i></button>
+            <h3 data-product-title></h3>
+            <p data-product-note></p>
+            <div class="product-modal-meta" data-product-meta></div>
+            <div class="product-gallery" data-product-gallery></div>
+            <div data-product-price></div>
+            <div class="modal-actions">
+                <a class="modal-btn modal-trigger" href="#contact" data-modal="consultation">درخواست مشاوره</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/catalog.js?v=20260905-z2"></script>
+    <script src="js/script.js?v=20260905-z2"></script>
 </body>
 
 </html>

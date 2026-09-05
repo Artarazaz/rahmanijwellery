@@ -1,0 +1,610 @@
+/* ============================================================
+   زرنگار — Complete Design System
+   Full component library for Rahmani jewelry site redesign
+   ============================================================ */
+
+/* -------------------- 1. Design Tokens -------------------- */
+:root {
+  --z-bg: #312f30;
+  --z-cream: #fff4e9;
+  --z-offwhite: #fff9ee;
+  --z-ink-dark: #312f30;
+  --z-peach: #e8b08a;
+  --z-peach-line: rgba(232, 176, 138, 0.22);
+  --z-muted: #cacaca;
+  --z-muted-2: #8f8f8f;
+  --z-card-img: #4d433e;
+  --z-card-text: #1d1917;
+  --z-white: #ffffff;
+}
+
+/* -------------------- 2. Decorative Vertical Lines -------------------- */
+.page-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  max-width: 1220px;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+}
+.page-lines i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--z-peach-line);
+}
+.page-lines i:nth-child(1) { left: 19%; }
+.page-lines i:nth-child(2) { left: 50%; }
+.page-lines i:nth-child(3) { left: 81%; }
+#page-shell { position: relative; }
+
+/* -------------------- 3. Navigation -------------------- */
+.z-nav {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 34px;
+  gap: 24px;
+}
+.z-nav-group {
+  direction: rtl;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  color: var(--z-cream);
+  font-size: 12.5px;
+}
+.z-nav-group a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .2s;
+  white-space: nowrap;
+}
+.z-nav-group a:hover { color: var(--z-peach); }
+.z-nav-group .ic {
+  width: 13px;
+  height: 13px;
+  stroke: var(--z-cream);
+  fill: none;
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+.z-brand {
+  font-family: 'Aref Ruqaa', serif;
+  font-size: 25px;
+  color: var(--z-cream);
+  font-weight: 700;
+}
+.z-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--z-white);
+  font-size: 22px;
+}
+
+/* -------------------- 4. Buttons: Diagonal Cut-Corner -------------------- */
+.btn-cut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--z-cream);
+  color: var(--z-ink-dark);
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 13px 24px;
+  border-radius: 0 18px 0 18px;
+  white-space: nowrap;
+  transition: background .2s, transform .2s;
+  border: none;
+  cursor: pointer;
+}
+.btn-cut:hover {
+  background: var(--z-peach);
+  transform: translateY(-1px);
+}
+
+/* -------------------- 5. Hero Section -------------------- */
+.z-hero {
+  position: relative;
+  padding-top: 56px;
+}
+.z-hero-row {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: 0.62fr 1fr;
+  gap: 0;
+  align-items: start;
+}
+.z-hero-visual {
+  position: relative;
+  height: 520px;
+  border-radius: 0 190px 0 0;
+  border: 1px solid var(--z-peach);
+  background:
+    radial-gradient(circle at 35% 25%, rgba(232, 176, 138, 0.22), transparent 55%),
+    linear-gradient(155deg, #443c37, #262220);
+  overflow: hidden;
+}
+.z-hero-visual .center-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.z-hero-visual .center-art svg {
+  width: 52%;
+  height: 52%;
+  opacity: .92;
+}
+.z-hero-text {
+  direction: rtl;
+  text-align: right;
+  padding: 38px 8px 0 44px;
+  position: relative;
+}
+.z-hero-text h1 {
+  font-family: 'Aref Ruqaa', serif;
+  font-weight: 400;
+  color: var(--z-cream);
+  font-size: clamp(48px, 5.6vw, 78px);
+  line-height: 1.18;
+  max-width: 8ch;
+}
+.z-hero-text p.sub {
+  margin-top: 18px;
+  color: var(--z-white);
+  font-size: 15px;
+}
+.z-hero-cta { margin-top: 30px; }
+.z-sparkle-accent {
+  position: absolute;
+  top: 0;
+  left: 38%;
+  width: 70px;
+  height: 70px;
+  opacity: .9;
+}
+.z-sparkle-accent svg { width: 100%; height: 100%; }
+.z-social-bar {
+  direction: ltr;
+  position: absolute;
+  left: auto;
+  right: 26px;
+  top: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.z-social-bar a { color: var(--z-peach); width: 15px; height: 15px; }
+.z-social-bar svg { width: 100%; height: 100%; }
+
+/* -------------------- 6. Ticker Strip (Scrolling Prices) -------------------- */
+.ticker-strip {
+  border-top: 1px solid var(--z-peach-line);
+  border-bottom: 1px solid var(--z-peach-line);
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+}
+.ticker-track {
+  display: inline-flex;
+  gap: 48px;
+  padding: 11px 0;
+  animation: ticker-scroll 30s linear infinite;
+}
+.ticker-strip:hover .ticker-track {
+  animation-play-state: paused;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-item {
+  font-size: 12.5px;
+  color: var(--z-muted);
+  display: inline-flex;
+  gap: 8px;
+}
+.ticker-item b {
+  color: var(--z-peach);
+  font-weight: 600;
+}
+
+/* -------------------- 7. Section Dividers & Headings -------------------- */
+.z-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.z-divider .ln {
+  width: 80px;
+  height: 1px;
+  background: var(--z-peach-line);
+}
+.z-divider .diamond {
+  width: 15px;
+  height: 15px;
+  color: var(--z-peach);
+}
+.z-section-head {
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto 54px;
+}
+.z-section-head h2 {
+  font-family: 'Aref Ruqaa', serif;
+  font-size: clamp(30px, 3.2vw, 40px);
+  color: var(--z-cream);
+  font-weight: 400;
+}
+.z-section-head p {
+  color: var(--z-white);
+  margin-top: 10px;
+  font-size: 14.5px;
+}
+
+/* -------------------- 8. Category Grid -------------------- */
+.z-cat-grid {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.z-cat-tile {
+  direction: rtl;
+  position: relative;
+  aspect-ratio: 121 / 103;
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #4a4038, #262220);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .25s;
+}
+.z-cat-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+}
+.z-cat-tile:hover { transform: translateY(-3px); }
+.z-cat-tile span {
+  position: relative;
+  z-index: 1;
+  font-size: 15px;
+  color: var(--z-white);
+}
+
+/* -------------------- 9. Featured Pieces (Zigzag Rows) -------------------- */
+.z-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 38px;
+}
+.z-feature-row {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.z-feature-row.reverse { flex-direction: row-reverse; }
+.z-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 48%;
+}
+.z-feature-row.reverse .z-feature-item { flex-direction: row-reverse; }
+.z-feature-visual {
+  position: relative;
+  flex-shrink: 0;
+  width: 130px;
+  height: 110px;
+}
+.z-feature-visual::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--z-peach);
+  z-index: 0;
+}
+.z-feature-row.reverse .z-feature-visual::before { left: auto; right: 8px; }
+.z-feature-visual .box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(160deg, #4a4038, #262220);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.z-feature-visual .box svg { width: 44%; height: 44%; opacity: .9; }
+.z-feature-body { direction: rtl; text-align: right; }
+.z-feature-body h3 {
+  font-family: 'Aref Ruqaa', serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--z-white);
+}
+.z-feature-body p {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--z-white);
+  max-width: 34ch;
+}
+.z-feature-body .btn-cut { margin-top: 16px; padding: 11px 20px; font-size: 11.5px; }
+
+/* -------------------- 10. Showcase Carousel -------------------- */
+.z-showcase-head {
+  direction: ltr;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 0 28px;
+  margin-top: -28px;
+}
+.z-arrow-pair { direction: ltr; display: flex; gap: 6px; }
+.z-arrow-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+.z-arrow-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--z-cream);
+  fill: none;
+  stroke-width: 1.6;
+}
+.z-arrow-prev { background: #272321; border-radius: 8px 0 0 0; }
+.z-arrow-next { background: var(--z-peach); border-radius: 0 0 8px 0; }
+.z-arrow-next svg { stroke: var(--z-ink-dark); }
+.z-showcase-track {
+  direction: ltr;
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 6px;
+}
+.z-showcase-track::-webkit-scrollbar { display: none; }
+.z-showcase-card {
+  direction: rtl;
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
+.z-showcase-img {
+  position: relative;
+  height: 200px;
+  border-radius: 2px;
+  background: var(--z-card-img);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.z-showcase-img svg { width: 46%; height: 46%; opacity: .9; }
+.z-showcase-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(232, 176, 138, 0.4);
+  border: 1px solid var(--z-peach);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--z-white);
+}
+.z-showcase-info {
+  background: var(--z-card-text);
+  padding: 14px;
+  text-align: right;
+}
+.z-showcase-info h4 {
+  font-family: 'Aref Ruqaa', serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--z-white);
+}
+.z-showcase-info span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--z-muted);
+}
+
+/* -------------------- 11. Price Table Card -------------------- */
+.z-price-card {
+  background: var(--z-card-text);
+  border-radius: 4px;
+  overflow: hidden;
+  direction: ltr;
+}
+.z-price-top {
+  direction: rtl;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  background: var(--z-card-img);
+}
+.z-price-top h3 {
+  font-family: 'Aref Ruqaa', serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--z-cream);
+}
+.z-live-dot {
+  direction: rtl;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--z-muted);
+}
+.z-live-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8ea77c;
+  animation: z-pulse 1.8s infinite;
+}
+@keyframes z-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+.z-price-table { width: 100%; border-collapse: collapse; }
+.z-price-table thead th {
+  direction: rtl;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--z-muted);
+  font-weight: 500;
+  padding: 14px 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.z-price-table thead th:last-child,
+.z-price-table tbody td:last-child { text-align: left; }
+.z-price-table tbody td {
+  direction: rtl;
+  padding: 15px 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+}
+.z-price-table tbody tr:last-child td { border-bottom: none; }
+.z-r-name small { display: block; color: var(--z-muted); font-size: 11px; margin-top: 2px; }
+.z-r-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--z-peach);
+  font-weight: 600;
+}
+.z-r-delta { font-variant-numeric: tabular-nums; font-size: 12px; }
+.z-r-delta.up { color: #8ea77c; }
+.z-r-delta.down { color: #c17b6e; }
+.z-price-note {
+  direction: rtl;
+  padding: 14px 26px;
+  font-size: 11.5px;
+  color: var(--z-muted-2);
+}
+
+/* -------------------- 12. Process Steps -------------------- */
+.z-process {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+.z-p-step {
+  direction: rtl;
+  text-align: right;
+  padding: 0 0 0 22px;
+  border-left: 1px solid var(--z-peach-line);
+}
+.z-p-step:last-child { border-left: none; padding-left: 0; }
+.z-p-step .num {
+  font-family: 'Aref Ruqaa', serif;
+  font-size: 36px;
+  color: var(--z-peach);
+}
+.z-p-step h4 { margin-top: 10px; font-size: 15px; color: var(--z-cream); }
+.z-p-step p { margin-top: 6px; color: var(--z-muted); font-size: 13px; }
+
+/* -------------------- 13. Footer -------------------- */
+.z-footer {
+  padding: 70px 0 30px;
+  position: relative;
+  z-index: 2;
+}
+.z-foot-top {
+  direction: ltr;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  padding-bottom: 44px;
+}
+.z-foot-links { direction: rtl; display: flex; gap: 46px; }
+.z-foot-col h5 {
+  font-size: 12px;
+  color: var(--z-muted);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+.z-foot-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.z-foot-col a { color: var(--z-white); font-size: 12.5px; }
+.z-foot-col a:hover { color: var(--z-peach); }
+.z-foot-cta {
+  direction: rtl;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.z-foot-cta p { color: var(--z-muted); font-size: 12px; }
+.z-foot-social {
+  direction: ltr;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid var(--z-peach-line);
+}
+.z-foot-social .icons { display: flex; gap: 16px; }
+.z-foot-social .icons a { width: 14px; height: 14px; color: var(--z-peach); }
+.z-foot-social .icons svg { width: 100%; height: 100%; }
+.z-foot-social .copyright {
+  direction: rtl;
+  font-size: 12px;
+  color: var(--z-muted);
+  font-weight: 300;
+}
+
+/* -------------------- 14. Display Font Class -------------------- */
+.display {
+  font-family: 'Aref Ruqaa', 'Noto Naskh Arabic', Georgia, serif;
+}
+
+/* -------------------- 15. Responsive -------------------- */
+@media (max-width: 960px) {
+  .z-hero-row { grid-template-columns: 1fr; }
+  .z-hero-visual { height: 340px; border-radius: 0 0 0 90px; margin: 0 24px; }
+  .z-hero-text { padding: 32px 24px 0; }
+  .z-social-bar { position: static; flex-direction: row; margin: 24px 24px 0; }
+  .z-sparkle-accent { display: none; }
+  .z-cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .z-feature-row, .z-feature-row.reverse { flex-direction: column; align-items: flex-start; }
+  .z-feature-item, .z-feature-row.reverse .z-feature-item { width: 100%; flex-direction: row; }
+  .z-process { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+  .z-p-step { border-left: none; padding: 0; border-top: 1px solid var(--z-peach-line); padding-top: 20px; }
+  .z-foot-top { flex-direction: column; }
+  .z-foot-links { gap: 30px; flex-wrap: wrap; }
+  .z-foot-cta { align-items: flex-start; text-align: right; }
+  .z-nav-group { display: none; }
+  .z-menu-btn { display: block; }
+}

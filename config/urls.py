@@ -22,24 +22,48 @@ from django.http import FileResponse
 from django.urls import path
 from django.views.static import serve
 
-from prices.views import create_price, market_data, market_history, prices_list, update_price
+from prices.catalog_views import (
+    product_image,
+    products_list,
+    studio_login,
+    studio_logout,
+    studio_product_create,
+    studio_product_detail,
+    studio_products,
+    studio_session,
+)
+from prices.views import create_price, market_data, market_history, prices_list, scrape_proxy, update_price
 
 
-def frontend_index(request):
-    return FileResponse(
-        open(Path(settings.BASE_DIR) / "frontend" / "index.html", "rb"),
-        content_type="text/html; charset=utf-8",
-    )
+def frontend_page(filename):
+    def view(request):
+        return FileResponse(
+            open(Path(settings.BASE_DIR) / "frontend" / filename, "rb"),
+            content_type="text/html; charset=utf-8",
+        )
+
+    return view
 
 
 urlpatterns = [
-    path("", frontend_index),
+    path("", frontend_page("index.html")),
+    path("products/", frontend_page("products.html")),
+    path("panel/", frontend_page("panel.html")),
     path("admin/", admin.site.urls),
     path("api/market/", market_data),
     path("api/market/history/", market_history),
+    path("api/scrape-proxy/", scrape_proxy),
     path("api/prices/", prices_list),
     path("api/prices/create/", create_price),
     path("api/prices/<int:id>/", update_price),
+    path("api/products/", products_list),
+    path("api/products/images/<int:image_id>/", product_image, name="product-image"),
+    path("api/studio/session/", studio_session),
+    path("api/studio/login/", studio_login),
+    path("api/studio/logout/", studio_logout),
+    path("api/studio/products/", studio_products),
+    path("api/studio/products/create/", studio_product_create),
+    path("api/studio/products/<int:product_id>/", studio_product_detail),
     path("css/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "css"}),
     path("js/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "js"}),
     path("assets/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "assets"}),
