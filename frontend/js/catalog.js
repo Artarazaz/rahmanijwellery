@@ -237,11 +237,43 @@ window.Rahmani = window.Rahmani || {};
         }
     };
 
+    const CATEGORY_LABELS = {
+        ring: 'انگشتر',
+        earring: 'گوشواره',
+        necklace: 'گردنبند',
+        bracelet: 'دستبند',
+        other: 'سایر'
+    };
+
     const initProductsPage = async () => {
         const root = document.getElementById('catalog-grid');
         const filters = document.getElementById('catalog-filters');
         if (!root || !filters) return;
-        let currentCategory = '';
+
+        // Read category from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentCategory = urlParams.get('category') || '';
+
+        // Show filter banner if category is set from URL
+        const showFilterBanner = (catId) => {
+            let banner = document.getElementById('filter-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'filter-banner';
+                banner.className = 'filter-banner';
+                const catalogPage = document.querySelector('.catalog-page');
+                if (catalogPage) catalogPage.prepend(banner);
+            }
+            if (catId && CATEGORY_LABELS[catId]) {
+                banner.innerHTML = `<span>فیلتر <strong>${CATEGORY_LABELS[catId]}</strong> برای شما فعال شد. می‌توانید فیلترها را تغییر دهید.</span><button onclick="this.parentElement.remove()" type="button" aria-label="بستن">✕</button>`;
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+        };
+
+        showFilterBanner(currentCategory);
+
         const paint = async () => {
             const query = currentCategory ? `?category=${encodeURIComponent(currentCategory)}` : '';
             const payload = await fetchJson(`/api/products/${query}`);
@@ -256,6 +288,12 @@ window.Rahmani = window.Rahmani || {};
             filters.querySelectorAll('.catalog-filter').forEach((button) => {
                 button.addEventListener('click', () => {
                     currentCategory = button.dataset.category || '';
+                    showFilterBanner(currentCategory);
+                    // Update URL without reload
+                    const newUrl = currentCategory
+                        ? `${window.location.pathname}?category=${encodeURIComponent(currentCategory)}`
+                        : window.location.pathname;
+                    window.history.replaceState({}, '', newUrl);
                     paint().catch(() => {
                         root.innerHTML = '<p class="catalog-empty">بارگذاری محصولات با خطا روبه‌رو شد.</p>';
                     });

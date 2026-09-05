@@ -35,12 +35,38 @@ from prices.catalog_views import (
 from prices.views import create_price, market_data, market_history, prices_list, scrape_proxy, update_price
 
 
+MIME_TYPES = {
+    ".css": "text/css",
+    ".js": "application/javascript",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".json": "application/json",
+}
+
+
 def frontend_page(filename):
     def view(request):
         return FileResponse(
             open(Path(settings.BASE_DIR) / "frontend" / filename, "rb"),
             content_type="text/html; charset=utf-8",
         )
+
+    return view
+
+
+def frontend_static(subdir):
+    def view(request, path):
+        full_path = Path(settings.BASE_DIR) / "frontend" / subdir / path
+        ext = full_path.suffix.lower()
+        content_type = MIME_TYPES.get(ext, "application/octet-stream")
+        return FileResponse(open(full_path, "rb"), content_type=content_type)
 
     return view
 
@@ -64,7 +90,7 @@ urlpatterns = [
     path("api/studio/products/", studio_products),
     path("api/studio/products/create/", studio_product_create),
     path("api/studio/products/<int:product_id>/", studio_product_detail),
-    path("css/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "css"}),
-    path("js/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "js"}),
-    path("assets/<path:path>", serve, {"document_root": Path(settings.BASE_DIR) / "frontend" / "assets"}),
+    path("css/<path:path>", frontend_static("css")),
+    path("js/<path:path>", frontend_static("js")),
+    path("assets/<path:path>", frontend_static("assets")),
 ]

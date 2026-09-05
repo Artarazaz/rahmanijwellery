@@ -8,6 +8,31 @@
     z-index: 1;
 }
 
+/* Filter Banner */
+.filter-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(212, 165, 116, 0.12);
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--paper);
+}
+.filter-banner strong { color: var(--gold-bright); }
+.filter-banner button {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    transition: color .2s;
+}
+.filter-banner button:hover { color: var(--paper); }
+
 .catalog-page { padding: 70px 0 120px; }
 .catalog-heading { align-items: end; display: flex; justify-content: space-between; margin-bottom: 28px; }
 .catalog-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
