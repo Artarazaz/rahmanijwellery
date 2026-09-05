@@ -231,7 +231,7 @@ window.Rahmani = window.Rahmani || {};
         try {
             const featured = await fetchJson('/api/products/?featured=1&limit=3');
             const payload = featured.products.length ? featured : await fetchJson('/api/products/?limit=3');
-            renderProducts(root, payload.products, { featuredFirst: true });
+            renderProducts(root, payload.products);
         } catch (error) {
             root.innerHTML = '<p class="catalog-empty">در حال حاضر نمایش کالکشن ممکن نیست.</p>';
         }
