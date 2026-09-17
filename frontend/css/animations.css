@@ -171,7 +171,32 @@
 }
 .in-view .scale-in, .scale-in.in-view { opacity: 1; transform: scale(1); }
 
-/* ==================== H. CATEGORY TILE ENTRANCE ==================== */
+/* ==================== H. COLLECTIONS ARCH ENTRANCE ==================== */
+.collections-grid .collection-arch-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.8s var(--anim-ease), transform 0.8s var(--anim-ease),
+                box-shadow 0.5s ease, border-color 0.4s ease;
+}
+.collections-grid.in-view .collection-arch-card,
+.collection-arch-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+.collections-grid .collection-arch-card:nth-child(2) { transition-delay: 0.1s; }
+.collections-grid .collection-arch-card:nth-child(3) { transition-delay: 0.2s; }
+.collections-grid .collection-arch-card:nth-child(4) { transition-delay: 0.3s; }
+
+.capsules-ribbon {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s var(--anim-ease) 0.15s, transform 0.9s var(--anim-ease) 0.15s;
+}
+.capsules-ribbon.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .cat-grid .cat-tile {
     opacity: 0;
     transform: translateY(28px);
@@ -202,7 +227,47 @@
 .hero-meta.in-view strong { opacity: 1; transform: translateY(0); }
 .hero-meta strong .suffix { color: var(--gold-300); }
 
-/* ==================== J. STATEMENT QUOTE ==================== */
+/* ==================== J. WHY RAHMANI & PILLARS ENTRANCE ==================== */
+.statement-banner {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.9s var(--anim-ease), transform 0.9s var(--anim-ease);
+}
+.statement-banner.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pillars-grid .pillar-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.75s var(--anim-ease), transform 0.75s var(--anim-ease),
+                border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.pillars-grid.in-view .pillar-card,
+.pillar-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+.pillars-grid .pillar-card:nth-child(2) { transition-delay: 0.1s; }
+.pillars-grid .pillar-card:nth-child(3) { transition-delay: 0.2s; }
+.pillars-grid .pillar-card:nth-child(4) { transition-delay: 0.3s; }
+
+/* ==================== JA. SEASONAL CURATION ENTRANCE ==================== */
+.seasonal-products-grid .product-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s var(--anim-ease), transform 0.8s var(--anim-ease),
+                border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.seasonal-products-grid.in-view .product-card,
+.seasonal-products-grid .product-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+.seasonal-products-grid .product-card:nth-child(2) { transition-delay: 0.12s; }
+.seasonal-products-grid .product-card:nth-child(3) { transition-delay: 0.24s; }
+
 .statement blockquote {
     opacity: 0;
     transform: translateY(20px);

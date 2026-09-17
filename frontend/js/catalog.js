@@ -58,24 +58,45 @@ window.Rahmani = window.Rahmani || {};
         }
     };
 
+    const CATEGORY_DEFAULT_IMAGES = {
+        ring: 'assets/gold_ring_1786118338142.png',
+        necklace: 'assets/gold_necklace_1786118350826.png',
+        bracelet: 'assets/gold_bracelet_1786118365180.png',
+        earring: 'assets/gold_earrings.jpg',
+        other: 'assets/gold_necklace_1786118350826.png'
+    };
+
     const productCardHtml = (product, index, total, featured = false) => {
-        const image = product.images?.[0]?.url || 'assets/gold_necklace_1786118350826.png';
+        const defaultImg = CATEGORY_DEFAULT_IMAGES[product.category] || 'assets/gold_necklace_1786118350826.png';
+        const image = product.images?.[0]?.url || defaultImg;
         const weight = toPersianDigits(product.weight);
         const featuredClass = featured ? ' product-card-featured' : '';
+        const badgeText = featured ? 'شاهکار منتخب فصل' : (product.category_label || 'طلای ۱۸ عیار');
         return `
             <article class="product-card${featuredClass} reveal is-visible" data-product-id="${product.id}" data-weight="${product.weight}" data-making-charge="${product.making_charge}" data-profit="${product.profit}">
                 <div class="product-media">
                     <span class="product-index">${padIndex(index)} / ${padIndex(total)}</span>
+                    <span class="product-tag-pill">${escapeHtml(badgeText)}</span>
                     <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)}" loading="lazy">
-                    <button class="product-action" type="button" data-product-id="${product.id}">مشاهده جزئیات <i class="ph ph-arrow-up-left"></i></button>
+                    <button class="product-action" type="button" data-product-id="${product.id}">
+                        <span>مشاهده شناسنامه</span>
+                        <i class="ph ph-arrow-up-left"></i>
+                    </button>
                 </div>
                 <div class="product-info">
                     <div class="product-title-row">
-                        <h3>${escapeHtml(product.name)}</h3><span>${escapeHtml(product.sku || product.category_label)}</span>
+                        <h3>${escapeHtml(product.name)}</h3>
+                        <span class="product-sku-badge">${escapeHtml(product.sku || product.category_label)}</span>
                     </div>
-                    <p class="product-note">${escapeHtml(product.note || product.category_label)}</p>
-                    <div class="product-data"><span><i class="ph ph-scales"></i> ${weight} گرم</span><span><i class="ph ph-sparkle"></i> طلای ۱۸ عیار</span></div>
-                    <div class="calculated-price"><span>قیمت نهایی</span><strong class="final-price">در حال محاسبه...</strong></div>
+                    <p class="product-note">${escapeHtml(product.note || 'ساخت انحصاری آتلیه رحمانی با استاندارد عیار ۷۵۰')}</p>
+                    <div class="product-data">
+                        <span><i class="ph ph-scales"></i> ${weight} گرم</span>
+                        <span><i class="ph ph-sparkle"></i> طلای ۱۸ عیار (۷۵۰)</span>
+                    </div>
+                    <div class="calculated-price">
+                        <span class="calc-label">بهای روز با اجرت شفاف:</span>
+                        <strong class="final-price">در حال محاسبه...</strong>
+                    </div>
                 </div>
             </article>
         `;
@@ -231,9 +252,9 @@ window.Rahmani = window.Rahmani || {};
         try {
             const featured = await fetchJson('/api/products/?featured=1&limit=3');
             const payload = featured.products.length ? featured : await fetchJson('/api/products/?limit=3');
-            renderProducts(root, payload.products);
+            renderProducts(root, payload.products, { featuredFirst: false });
         } catch (error) {
-            root.innerHTML = '<p class="catalog-empty">در حال حاضر نمایش کالکشن ممکن نیست.</p>';
+            root.innerHTML = '<p class="catalog-empty">در حال حاضر امکان نمایش منتخب فصل وجود ندارد.</p>';
         }
     };
 

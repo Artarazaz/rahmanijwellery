@@ -33,21 +33,30 @@
 
     <header class="site-header" id="site-header">
         <div class="nav-inner">
-            <nav class="main-nav nav-group" id="main-nav" aria-label="ناوبری اصلی">
-                <a href="#market"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5-3 1.1-3 2.5 1.3 2.5 3 2.5 3-1.1 3-2.5"/></svg>نبض بازار</a>
-                <a href="#collections"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg>کالکشن‌ها</a>
-            </nav>
+            <div class="nav-side nav-right">
+                <a href="products.html" class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span>نمونه‌کارها</span></a>
+                <a href="#collections" class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span>کالکشن‌ها</span></a>
+            </div>
 
-            <a class="brand z-brand" href="#home" aria-label="خانه جواهر رحمانی">رحمانی</a>
+            <div class="nav-brand-wrap">
+                <a class="brand z-brand" href="#home" aria-label="خانه جواهر رحمانی">رحمانی</a>
+            </div>
 
-            <div class="nav-group">
-                <a href="products.html"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg>نمونه‌کارها</a>
-                <a class="modal-trigger" href="#contact" data-modal="consultation"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v14H7l-3 3z"/></svg>تماس</a>
+            <div class="nav-side nav-left">
+                <a href="#market" class="nav-item"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5-3 1.1-3 2.5 1.3 2.5 3 2.5 3-1.1 3-2.5"/></svg><span>نبض بازار</span></a>
+                <a class="nav-item modal-trigger" href="#contact" data-modal="consultation"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v14H7l-3 3z"/></svg><span>تماس</span></a>
             </div>
 
             <button class="menu-toggle" id="menu-toggle" type="button" aria-label="باز کردن منو" aria-expanded="false">
                 <i class="ph ph-list"></i>
             </button>
+
+            <nav class="main-nav" id="main-nav" aria-label="ناوبری اصلی">
+                <a href="products.html">نمونه‌کارها</a>
+                <a href="#collections">کالکشن‌ها</a>
+                <a href="#market">نبض بازار</a>
+                <a class="modal-trigger" href="#contact" data-modal="consultation">تماس</a>
+            </nav>
         </div>
     </header>
 
@@ -96,163 +105,227 @@
             </div>
         </div>
 
-        <!-- Category Grid (Reference: Rings, Earrings, Necklace, Bracelets) -->
-        <section class="section-wrap" id="categories" style="padding-top: 80px;">
+        <!-- ==================== 1. HAUTE JOAILLERIE COLLECTIONS ==================== -->
+        <section class="collections-section section-wrap" id="collections">
+            <span id="categories" class="section-anchor" aria-hidden="true"></span>
             <div class="z-divider" data-reveal><span class="ln clip-reveal"></span><svg class="diamond" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span class="ln clip-reveal"></span></div>
-            <div class="z-section-head" data-reveal>
-                <h2>کالکشن‌ها</h2>
-                <p>تمام سبک‌هایی که در گالری رحمانی ساخته می‌شوند.</p>
-            </div>
-            <div class="card-stack" data-reveal>
-                <div class="stack-cards">
-                    <div class="stack-card" data-category="ring">
-                        <a href="products.html?category=ring" class="stack-card-inner">
-                            <div class="stack-card-bg" style="background: linear-gradient(135deg, #5a4a3a 0%, #3a2e24 50%, #2a1f18 100%);"></div>
-                            <svg class="stack-card-icon" viewBox="0 0 80 80" fill="none" stroke="rgba(212,165,116,0.6)" stroke-width="1.5"><circle cx="40" cy="40" r="28"/><circle cx="40" cy="40" r="20"/><path d="M40 12v4M40 64v4M12 40h4M64 40h4" stroke-width="1"/></svg>
-                            <h3>انگشتر</h3>
-                            <p>مجموعه‌ای از زیباترین طرح‌ها</p>
-                        </a>
-                    </div>
-                    <div class="stack-card" data-category="earring">
-                        <a href="products.html?category=earring" class="stack-card-inner">
-                            <div class="stack-card-bg" style="background: linear-gradient(135deg, #4a3a2a 0%, #352a1e 50%, #251c14 100%);"></div>
-                            <svg class="stack-card-icon" viewBox="0 0 80 80" fill="none" stroke="rgba(212,165,116,0.6)" stroke-width="1.5"><circle cx="40" cy="30" r="14"/><path d="M40 44v12M34 56h12" stroke-width="1.5"/><circle cx="40" cy="64" r="4"/></svg>
-                            <h3>گوشواره</h3>
-                            <p>طراحی ظریف و خیره‌کننده</p>
-                        </a>
-                    </div>
-                    <div class="stack-card" data-category="necklace">
-                        <a href="products.html?category=necklace" class="stack-card-inner">
-                            <div class="stack-card-bg" style="background: linear-gradient(135deg, #4e3e30 0%, #382c22 50%, #281f18 100%);"></div>
-                            <svg class="stack-card-icon" viewBox="0 0 80 80" fill="none" stroke="rgba(212,165,116,0.6)" stroke-width="1.5"><path d="M20 20c10 20 30 20 40 0" /><circle cx="40" cy="50" r="6"/></svg>
-                            <h3>گردنبند</h3>
-                            <p>زیبایی در هر جزئیات</p>
-                        </a>
-                    </div>
-                    <div class="stack-card" data-category="bracelet">
-                        <a href="products.html?category=bracelet" class="stack-card-inner">
-                            <div class="stack-card-bg" style="background: linear-gradient(135deg, #52422e 0%, #3c3020 50%, #2a2018 100%);"></div>
-                            <svg class="stack-card-icon" viewBox="0 0 80 80" fill="none" stroke="rgba(212,165,116,0.6)" stroke-width="1.5"><ellipse cx="40" cy="40" rx="28" ry="16"/><ellipse cx="40" cy="40" rx="22" ry="11" stroke-width="1"/></svg>
-                            <h3>دستبند</h3>
-                            <p>کیفیت و اصالت بی‌نظیر</p>
-                        </a>
-                    </div>
+            
+            <div class="collections-header" data-reveal>
+                <div class="collections-title-wrap">
+                    <p class="eyebrow"><span>۰۱</span> کالکشن‌های جاودان</p>
+                    <h2>هنر بازتاب نور و طلا</h2>
+                    <p class="collections-desc">چهار قلمرو از زرگری فاخر رحمانی؛ آفریده‌شده با طلای ۱۸ عیار استاندارد (۷۵۰) و پرداخت وسواس‌گونه آینه‌ای در آتلیه اختصاصی.</p>
                 </div>
-                <div class="stack-controls">
-                    <button class="stack-arrow stack-arrow-next" aria-label="کالکشن بعدی">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
-                    </button>
-                    <div class="stack-dots">
-                        <span class="stack-dot active"></span>
-                        <span class="stack-dot"></span>
-                        <span class="stack-dot"></span>
-                        <span class="stack-dot"></span>
+                <div class="collections-header-cta">
+                    <a class="button button-gold button-luxury" href="products.html">
+                        <span>مشاهده تمام آثار</span>
+                        <i class="ph ph-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4 Masterpiece Category Arch Cards -->
+            <div class="collections-grid" data-reveal="group">
+                <!-- Ring -->
+                <article class="collection-arch-card" data-reveal>
+                    <a href="products.html?category=ring" class="arch-card-link">
+                        <div class="arch-card-visual">
+                            <span class="arch-card-badge">عیار ۱۸ · ۷۵۰</span>
+                            <span class="arch-card-monogram">R</span>
+                            <img src="assets/gold_ring_1786118338142.png" alt="انگشترهای فاخر رحمانی" loading="lazy">
+                            <div class="arch-card-overlay"></div>
+                        </div>
+                        <div class="arch-card-body">
+                            <div class="arch-card-meta">
+                                <span class="arch-cat-code">RINGS / ۰۱</span>
+                                <span class="arch-cat-count">مجموعه انحصاری</span>
+                            </div>
+                            <h3>انگشترهای فاخر</h3>
+                            <p>پیوند جاودان فرم، نور و ارگونومی اصیل؛ تراش‌های چشم‌نواز با دست روی طلای زرد و سفید.</p>
+                            <div class="arch-card-footer">
+                                <span class="arch-card-action">کاوش انگشترها <i class="ph ph-arrow-left"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Earring -->
+                <article class="collection-arch-card" data-reveal style="transition-delay: 0.1s;">
+                    <a href="products.html?category=earring" class="arch-card-link">
+                        <div class="arch-card-visual">
+                            <span class="arch-card-badge">سفارشی آتلیه</span>
+                            <span class="arch-card-monogram">R</span>
+                            <img src="assets/gold_earrings.jpg" alt="گوشواره‌های دست‌ساز رحمانی" loading="lazy">
+                            <div class="arch-card-overlay"></div>
+                        </div>
+                        <div class="arch-card-body">
+                            <div class="arch-card-meta">
+                                <span class="arch-cat-code">EARRINGS / ۰۲</span>
+                                <span class="arch-cat-count">دست‌ساز</span>
+                            </div>
+                            <h3>گوشواره‌های دست‌ساز</h3>
+                            <p>رقص پرتوهای نور در هر چرخش سر؛ قفل‌های ایمن و مهار مهندسی‌شده با حداکثر ظرافت.</p>
+                            <div class="arch-card-footer">
+                                <span class="arch-card-action">کاوش گوشواره‌ها <i class="ph ph-arrow-left"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Necklace -->
+                <article class="collection-arch-card" data-reveal style="transition-delay: 0.2s;">
+                    <a href="products.html?category=necklace" class="arch-card-link">
+                        <div class="arch-card-visual">
+                            <span class="arch-card-badge">طراحی نمادین</span>
+                            <span class="arch-card-monogram">R</span>
+                            <img src="assets/gold_necklace_1786118350826.png" alt="گردنبند و آویز رحمانی" loading="lazy">
+                            <div class="arch-card-overlay"></div>
+                        </div>
+                        <div class="arch-card-body">
+                            <div class="arch-card-meta">
+                                <span class="arch-cat-code">NECKLACES / ۰۳</span>
+                                <span class="arch-cat-count">شاهکار</span>
+                            </div>
+                            <h3>گردنبند و آویز</h3>
+                            <p>خطوط زرین موزون در امتداد گردن؛ نگین‌های مخراجی‌شده با دقت میکرونی برای درخشش آرام.</p>
+                            <div class="arch-card-footer">
+                                <span class="arch-card-action">کاوش گردنبندها <i class="ph ph-arrow-left"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Bracelet -->
+                <article class="collection-arch-card" data-reveal style="transition-delay: 0.3s;">
+                    <a href="products.html?category=bracelet" class="arch-card-link">
+                        <div class="arch-card-visual">
+                            <span class="arch-card-badge">تراش آینه‌ای</span>
+                            <span class="arch-card-monogram">R</span>
+                            <img src="assets/gold_bracelet_1786118365180.png" alt="دستبند و النگو رحمانی" loading="lazy">
+                            <div class="arch-card-overlay"></div>
+                        </div>
+                        <div class="arch-card-body">
+                            <div class="arch-card-meta">
+                                <span class="arch-cat-code">BRACELETS / ۰۴</span>
+                                <span class="arch-cat-count">خلوص عیار</span>
+                            </div>
+                            <h3>دستبند و النگو</h3>
+                            <p>تلفیق استحکام بی‌بدیل طلا با وقار معاصر؛ وزن متناسب و صیقل‌کاری فوق‌العاده روی مچ.</p>
+                            <div class="arch-card-footer">
+                                <span class="arch-card-action">کاوش دستبندها <i class="ph ph-arrow-left"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            </div>
+
+            <!-- Signature Capsule Themes Ribbon -->
+            <div class="capsules-ribbon" data-reveal>
+                <div class="capsules-head">
+                    <div class="capsules-title">
+                        <span class="capsule-sub">مجموعه‌های امضا</span>
+                        <h3>روایت‌های زرین گالری رحمانی</h3>
                     </div>
-                    <button class="stack-arrow stack-arrow-prev" aria-label="کالکشن قبلی">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 6l-6 6 6 6"/></svg>
-                    </button>
+                    <span class="capsules-line"></span>
+                </div>
+                <div class="capsules-track">
+                    <a href="products.html" class="capsule-item">
+                        <span class="capsule-num">۰۱</span>
+                        <div class="capsule-info">
+                            <h4>خلوت الماس</h4>
+                            <p>تراش برلیان روی بستر مینیمال طلای ۱۸ عیار</p>
+                        </div>
+                        <i class="ph ph-arrow-left"></i>
+                    </a>
+                    <a href="products.html" class="capsule-item">
+                        <span class="capsule-num">۰۲</span>
+                        <div class="capsule-info">
+                            <h4>افسون زرین</h4>
+                            <p>بافت مواج و دست‌ساز الهام‌گرفته از تلالو آفتاب</p>
+                        </div>
+                        <i class="ph ph-arrow-left"></i>
+                    </a>
+                    <a href="products.html" class="capsule-item">
+                        <span class="capsule-num">۰۳</span>
+                        <div class="capsule-info">
+                            <h4>بهشت دونفره</h4>
+                            <p>حلقه‌ها و نشان‌های مانا برای پیوند جاودان</p>
+                        </div>
+                        <i class="ph ph-arrow-left"></i>
+                    </a>
+                    <a href="products.html" class="capsule-item">
+                        <span class="capsule-num">۰۴</span>
+                        <div class="capsule-info">
+                            <h4>گدازه طلا</h4>
+                            <p>فرم‌های ارگانیک و روان طلای مذاب</p>
+                        </div>
+                        <i class="ph ph-arrow-left"></i>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Zigzag Feature Rows -->
-        <section class="section-wrap" style="padding-top: 20px;">
-            <div class="feature-list">
-                <div class="feature-row">
-                    <div class="feature-item slide-r" data-reveal>
-                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><path d="M12 3l2.5 5 5.5.7-4 4 1 5.5L12 15.8 6.9 18.2l1-5.5-4-4L9.5 8z" stroke-linejoin="round"/></svg></div></div>
-                        <div class="feature-body">
-                            <h3>خلوت الماس</h3>
-                            <p>مجموعه‌ای که ظرافت الماس تراش‌خورده را با خطوطی ساده و امروزی ترکیب می‌کند.</p>
-                            <a href="products.html" class="btn-cut">مشاهده جزئیات</a>
+        <!-- ==================== 2. WHY RAHMANI / PILLARS OF AUTHENTICITY ==================== -->
+        <section class="why-rahmani section-wrap" id="why-rahmani" aria-label="ارکان اصالت رحمانی">
+            <div class="z-divider" data-reveal><span class="ln clip-reveal"></span><svg class="diamond" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span class="ln clip-reveal"></span></div>
+            
+            <div class="statement-banner" data-reveal>
+                <div class="statement-seal-col">
+                    <div class="gold-seal-badge">
+                        <div class="seal-inner">
+                            <span class="seal-r">R</span>
+                            <span class="seal-caption">HAUTE JOAILLERIE</span>
                         </div>
-                    </div>
-                    <div class="feature-item slide-l" data-reveal>
-                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><circle cx="12" cy="14" r="6"/><path d="M9 9l3-5 3 5" stroke-linejoin="round"/></svg></div></div>
-                        <div class="feature-body">
-                            <h3>افسون نقره‌ای</h3>
-                            <p>الهام‌گرفته از حس آزاد طبیعت؛ برای کسانی که جواهر را همراه شخصیتشان می‌خواهند.</p>
-                            <a href="products.html" class="btn-cut">مشاهده جزئیات</a>
-                        </div>
+                        <div class="seal-ring"></div>
                     </div>
                 </div>
-                <div class="feature-row reverse">
-                    <div class="feature-item slide-l" data-reveal>
-                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><path d="M4 7c4 5 12 5 16 0"/><path d="M8 11c2.5 2.5 5.5 2.5 8 0"/></svg></div></div>
-                        <div class="feature-body">
-                            <h3>بهشت دونفره</h3>
-                            <p>مجموعه‌ای برای جشن پیوندی ماندگار؛ طراحی‌شده برای دو نفر که یک قصه را می‌سازند.</p>
-                            <a href="products.html" class="btn-cut">مشاهده جزئیات</a>
-                        </div>
+                <div class="statement-quote-col">
+                    <p class="eyebrow"><span>۰۲</span> چرا گالری رحمانی</p>
+                    <blockquote class="statement-quote">
+                        «هر قطعه طلا، پیش از آن‌که زینت باشد، روایتی اصیل از وقار، خاطره و سرمایه‌ای ماندگار برای نسل‌هاست.»
+                    </blockquote>
+                    <p class="statement-author">خانه جواهر رحمانی · از ۱۳۶۸</p>
+                </div>
+                <div class="statement-stats-col">
+                    <div class="stat-item">
+                        <span class="stat-number">۱۰۰٪</span>
+                        <span class="stat-label">خلوص عیار ۷۵۰ تضمین‌شده</span>
                     </div>
-                    <div class="feature-item slide-r" data-reveal>
-                        <div class="feature-visual"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2"><rect x="4" y="9" width="16" height="6" rx="3"/></svg></div></div>
-                        <div class="feature-body">
-                            <h3>گدازه طلا</h3>
-                            <p>مجموعه‌ای درخشان که حس طلای مذاب را در قطعاتی روان و امروزی بازتاب می‌دهد.</p>
-                            <a href="products.html" class="btn-cut">مشاهده جزئیات</a>
-                        </div>
+                    <div class="stat-item">
+                        <span class="stat-number">۳۵+</span>
+                        <span class="stat-label">سال تجربه زرگری و اعتماد</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Showcase Carousel ("Our Best Feature") -->
-        <section class="section-wrap" style="padding-top: 40px; padding-bottom: 40px;">
-            <div class="showcase-head" data-reveal>
-                <div class="section-head" style="text-align:right; margin:0;">
-                    <h2>برگزیده‌های رحمانی</h2>
-                    <p>نگاهی به تازه‌ترین قطعات گالری.</p>
-                </div>
-                <div class="arrow-pair">
-                    <button class="arrow-btn arrow-prev" data-carousel="showcase" data-dir="-1" aria-label="قبلی"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-                    <button class="arrow-btn arrow-next" data-carousel="showcase" data-dir="1" aria-label="بعدی"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-                </div>
-            </div>
-            <div class="showcase-track" id="showcase" data-reveal>
-                <div class="showcase-card scale-in">
-                    <div class="showcase-img"><span class="showcase-tag">جدید</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><circle cx="12" cy="14" r="6"/><path d="M9 9l3-5 3 5" stroke-linejoin="round"/></svg></div>
-                    <div class="showcase-info"><h4>انگشتر مهتاب</h4><span>طلای ۱۸ عیار</span></div>
-                </div>
-                <div class="showcase-card scale-in" style="transition-delay: 0.1s;">
-                    <div class="showcase-img"><span class="showcase-tag">دست‌ساز</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><path d="M12 3l2.5 5 5.5.7-4 4 1 5.5L12 15.8 6.9 18.2l1-5.5-4-4L9.5 8z" stroke-linejoin="round"/></svg></div>
-                    <div class="showcase-info"><h4>گوشواره ستاره سحر</h4><span>طلای رزگلد</span></div>
-                </div>
-                <div class="showcase-card scale-in" style="transition-delay: 0.2s;">
-                    <div class="showcase-img"><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><rect x="4" y="9" width="16" height="6" rx="3"/></svg></div>
-                    <div class="showcase-info"><h4>دستبند رشته زرین</h4><span>طلای ۱۸ عیار</span></div>
-                </div>
-                <div class="showcase-card scale-in" style="transition-delay: 0.3s;">
-                    <div class="showcase-img"><span class="showcase-tag">جدید</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--paper)" stroke-width="1.1"><path d="M4 7c4 5 12 5 16 0"/><circle cx="12" cy="16" r="2.2"/></svg></div>
-                    <div class="showcase-info"><h4>گردنبند دو ردیفه</h4><span>طلای زرد و سفید</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="statement section-wrap reveal" data-reveal aria-label="بیانیه برند">
-            <div class="statement-line"></div>
-            <div class="statement-content">
-                <p class="eyebrow">چرا رحمانی</p>
-                <blockquote>«هر قطعه، پیش از آن‌که زینت باشد، بخشی از داستان شماست.»</blockquote>
-                <div class="signature">R /</div>
-            </div>
-            <div class="statement-side">مواد اصیل، طراحی آرام،<br>جزئیاتی که دیده می‌شوند.</div>
-        </section>
-
-        <section class="collection-section section-wrap" id="collections">
-            <div class="section-heading reveal">
-                <div>
-                    <p class="eyebrow"><span>۰۲</span> منتخب این فصل</p>
+        <!-- ==================== 3. SEASON'S CURATED SELECTION ==================== -->
+        <section class="seasonal-section section-wrap" id="seasonal" aria-label="منتخب این فصل">
+            <div class="z-divider" data-reveal><span class="ln clip-reveal"></span><svg class="diamond" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5z"/></svg><span class="ln clip-reveal"></span></div>
+            
+            <div class="seasonal-heading" data-reveal>
+                <div class="seasonal-title-wrap">
+                    <p class="eyebrow"><span>۰۳</span> کیوریتوری اختصاصی · منتخب این فصل</p>
                     <h2>قطعاتی برای<br><em>درخشیدن آرام</em></h2>
                 </div>
-                <div class="section-heading-side">
-                    <p>کالکشنی محدود از فرم‌های خالص و نورهای گرم؛ انتخاب‌شده برای سلیقه‌ای که تفاوت را در جزئیات
-                        می‌بیند.</p>
-                    <a class="text-link" href="products.html">مشاهده کاتالوگ کامل <i class="ph ph-arrow-left"></i></a>
+                <div class="seasonal-meta-wrap">
+                    <p>گزیده‌ای محدود از فاخرترین فرم‌ها و تراش‌های طلای ۱۸ عیار؛ انتخاب‌شده برای سلیقه‌های ویژه که وقار را در سادگی ناب و کمال جزئیات جستجو می‌کنند.</p>
+                    <div class="seasonal-actions">
+                        <a class="text-link" href="products.html">
+                            <span>مشاهده کاتالوگ کامل</span>
+                            <i class="ph ph-arrow-left"></i>
+                        </a>
+                        <span class="live-market-pill">
+                            <span class="live-dot"></span>
+                            <span>محاسبه خودکار با نرخ زنده طلا</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div class="products-grid" id="featured-products"></div>
+            <div class="products-grid seasonal-products-grid" id="featured-products" data-reveal="group">
+                <!-- Dynamically loaded from /api/products/?featured=1&limit=3 via catalog.js -->
+            </div>
         </section>
 
         <section class="market-section section-wrap" id="market">
@@ -409,8 +482,12 @@
                     href="mailto:info@rahmanijewelry.ir">info@rahmanijewelry.ir <i class="ph ph-arrow-up-left"></i></a>
             </div>
             <div class="footer-column">
-                <h3>دسترسی</h3><a href="products.html">کالکشن‌ها</a><a href="#market">نبض بازار</a><a
-                    href="#contact">تماس با ما</a>
+                <h3>دسترسی</h3>
+                <a href="#collections">کالکشن‌ها</a>
+                <a href="#why-rahmani">چرا رحمانی</a>
+                <a href="#seasonal">منتخب فصل</a>
+                <a href="#market">نبض بازار</a>
+                <a href="#contact">تماس با ما</a>
             </div>
             <div class="footer-column">
                 <h3>گالری</h3>

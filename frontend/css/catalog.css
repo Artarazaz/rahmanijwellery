@@ -37,7 +37,7 @@
 .catalog-heading { align-items: end; display: flex; justify-content: space-between; margin-bottom: 28px; }
 .catalog-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
 .catalog-filter { background: transparent; border: 1px solid var(--line); color: var(--muted); cursor: pointer; font-size: 11px; min-height: 36px; padding: 0 16px; transition: background .25s ease, border-color .25s ease, color .25s ease; }
-.catalog-filter:hover, .catalog-filter.is-active { background: var(--gold); border-color: var(--gold); color: var(--ink-0); }
+.catalog-filter:hover, .catalog-filter.is-active { background: var(--gold-100); border-color: var(--gold-100); color: var(--ink-0); font-weight: 600; box-shadow: 0 4px 14px rgba(226, 195, 132, 0.25); }
 .catalog-grid { display: grid; gap: 22px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .catalog-grid .product-media { height: 385px; }
 .catalog-empty { color: var(--muted); font-size: 13px; grid-column: 1 / -1; padding: 40px 0; text-align: center; }

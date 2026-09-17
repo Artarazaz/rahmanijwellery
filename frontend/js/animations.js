@@ -253,22 +253,22 @@
 
         const reveal = (target) => {
             if (target.dataset.reveal === 'group') {
-                target.className.includes('product-card') || target.parentElement?.classList.contains('products-grid')
-                    ? revealGroup(target)
-                    : target.classList.add('in-view');
+                revealGroup(target);
                 return;
             }
             target.classList.add('in-view');
         };
 
         const revealGroup = (container) => {
-            const cards = container.querySelectorAll('.product-card, [data-reveal]');
+            container.classList.add('in-view');
+            container.parentElement?.classList.add('in-view');
+            const cards = container.querySelectorAll('.product-card, .collection-arch-card, .pillar-card, [data-reveal]');
             cards.forEach((card, i) => {
-                card.style.transitionDelay = `${Math.min(i * 0.1, 0.6)}s`;
+                if (!card.style.transitionDelay) {
+                    card.style.transitionDelay = `${Math.min(i * 0.1, 0.6)}s`;
+                }
                 card.classList.add('in-view');
             });
-            container.parentElement?.classList.add('in-view');
-            container.classList.add('in-view');
         };
 
         if ('IntersectionObserver' in window) {
@@ -515,6 +515,25 @@
         });
     };
 
+    /* ── Luxury Card Subtle Tilt Interaction ────────────────── */
+    const initLuxuryTilt = () => {
+        if (reduceMotion) return;
+        const cards = document.querySelectorAll('.collection-arch-card, .pillar-card');
+        cards.forEach((card) => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                const rotateX = -(y / (rect.height / 2)) * 3;
+                const rotateY = (x / (rect.width / 2)) * 3;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-8px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+    };
+
     /* ── Boot ─────────────────────────────────────────────── */
     const init = () => {
         initHeroEntrance();
@@ -525,6 +544,7 @@
         initHeroScrollExit();
         initCardStack();
         initShowcaseDrag();
+        initLuxuryTilt();
     };
 
     if (document.readyState === 'loading') {

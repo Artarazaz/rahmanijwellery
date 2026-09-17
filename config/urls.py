@@ -73,6 +73,7 @@ def frontend_static(subdir):
 
 urlpatterns = [
     path("", frontend_page("index.html")),
+    path("index.html", frontend_page("index.html")),
     path("products/", frontend_page("products.html")),
     path("products.html", frontend_page("products.html")),
     path("panel/", frontend_page("panel.html")),
