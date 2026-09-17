@@ -6,6 +6,13 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["manage.py", "runserver", "8001"],
       "port": 8001
+    },
+    {
+      "name": "frontend-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-c", "import http.server, os; os.chdir('frontend'); http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler, port=int(os.environ.get('PORT', 5173)))"],
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }

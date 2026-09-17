@@ -74,6 +74,7 @@ def frontend_static(subdir):
 urlpatterns = [
     path("", frontend_page("index.html")),
     path("products/", frontend_page("products.html")),
+    path("products.html", frontend_page("products.html")),
     path("panel/", frontend_page("panel.html")),
     path("admin/", admin.site.urls),
     path("api/market/", market_data),
